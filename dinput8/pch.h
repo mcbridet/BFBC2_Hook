@@ -10,4 +10,7 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 
+// Standard (Visual) C++
+#include <Unknwn.h>
+
 #endif //PCH_H
