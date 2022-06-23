@@ -1,0 +1,91 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build BFBC2 Hook
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x86
+
+      - name: Setup NASM
+        uses: ilammy/setup-nasm@v1
+
+      - name: Build Boost
+        working-directory: ./external/boost
+        shell: cmd
+        run: bootstrap.bat && b2 install --prefix=../../third_party/boost --with-system --with-date_time --with-regex
+
+      - name: Build OpenSSL
+        working-directory: ./external/openssl
+        shell: cmd
+        run: |
+          mkdir ..\..\third_party\openssl
+          pushd ..\..\third_party\openssl
+          set BUILD_PATH=%CD%
+          popd
+          perl Configure VC-WIN32 --prefix=%BUILD_PATH% enable-ssl2 && ms\do_nasm && nmake -f ms\ntdll.mak && nmake -f ms\ntdll.mak test && nmake -f ms\ntdll.mak install
+      
+      - name: Build ZLIB
+        working-directory: ./external/zlib
+        shell: cmd
+        run: |
+          cmake -A Win32 -DCMAKE_INSTALL_PREFIX=..\..\third_party\zlib .
+          msbuild INSTALL.vcxproj /p:Configuration=Release /p:Platform=Win32
+      
+      - name: Build cpprestsdk
+        working-directory: ./external/cpprestsdk
+        shell: cmd
+        run: |
+          mkdir ..\..\third_party\cpprestsdk\
+          mkdir ..\..\third_party\cpprestsdk\lib
+          mklink ..\..\third_party\cpprestsdk\lib\libeay32.lib ..\..\openssl\lib\libeay32.lib
+          mklink ..\..\third_party\cpprestsdk\lib\ssleay32.lib ..\..\openssl\lib\ssleay32.lib
+          pushd ..\..\third_party\zlib\lib
+          set ZLIB_FILE_PATH=%CD%\zlib.lib
+          popd
+          cmake -A Win32 -DBOOST_ROOT=..\..\third_party\boost\ -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_INCLUDE_DIR=..\..\third_party\openssl\include -DOPENSSL_LIBRARIES=..\..\third_party\openssl\lib -DZLIB_LIBRARY=%ZLIB_FILE_PATH% -DZLIB_INCLUDE_DIR=..\..\third_party\zlib\include -DCMAKE_INSTALL_PREFIX=..\..\third_party\cpprestsdk .
+          msbuild INSTALL.vcxproj /p:Configuration=Release /p:Platform=Win32
+      
+      - name: Build Detours
+        working-directory: ./external/detours
+        run: |
+          mkdir ..\..\third_party\detours
+          mkdir ..\..\third_party\detours\include
+          mkdir ..\..\third_party\detours\lib
+          nmake
+          xcopy include\* ..\..\third_party\detours\include\
+          xcopy lib.X86\* ..\..\third_party\detours\lib\
+      
+      - name: Build Hook
+        run: msbuild
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: ReleaseBuild
+          path: Release
