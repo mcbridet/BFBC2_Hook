@@ -4,3 +4,6 @@
 [submodule "external/openssl"]
 	path = external/openssl
 	url = https://github.com/openssl/openssl.git
+[submodule "external/zlib"]
+	path = external/zlib
+	url = https://github.com/madler/zlib.git
