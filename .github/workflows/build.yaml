@@ -87,7 +87,7 @@ jobs:
         with:
           queries: security-and-quality
           languages: "cpp"
-          source-root: $GITHUB_WORKSPACE\dinput8
+          source-root: dinput8
       
       - name: Autobuild hook
         uses: github/codeql-action/autobuild@v2
