@@ -81,9 +81,18 @@ jobs:
           nmake
           xcopy include\* ..\..\third_party\detours\include\
           xcopy lib.X86\* ..\..\third_party\detours\lib\
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          queries: security-and-quality
+          languages: "cpp"
       
-      - name: Build Hook
-        run: msbuild
+      - name: Autobuild hook
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
       
       - name: Upload artifact
         uses: actions/upload-artifact@v2.3.1
