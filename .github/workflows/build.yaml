@@ -39,7 +39,7 @@ jobs:
       - name: Build Boost
         working-directory: ./external/boost
         shell: cmd
-        run: bootstrap.bat && b2 install --prefix=../../third_party/boost --with-system --with-date_time --with-regex
+        run: bootstrap.bat && b2 install address-model=32 define=BOOST_USE_WINAPI_VERSION=0x0502 --prefix=../../third_party/boost --with-date_time --with-log --with-regex --with-system release
 
       - name: Build OpenSSL
         working-directory: ./external/openssl
