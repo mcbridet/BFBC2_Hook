@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\wrapper">
+      <UniqueIdentifier>{41ec63f6-be20-4939-99fd-0939bb1f68c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\wrapper">
+      <UniqueIdentifier>{a4ee88c3-53ac-4476-8a22-e906ba4e0cef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hook">
+      <UniqueIdentifier>{5abe7085-a2ba-4428-aeae-e10b2dbaaa9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hook">
+      <UniqueIdentifier>{07f5bf83-f28d-4dfe-ae76-67685805383e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -22,7 +34,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dinput8.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="Hook.h">
+      <Filter>Header Files\hook</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files\hook</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files\hook</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +54,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dinput8.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="Hook.cpp">
+      <Filter>Source Files\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Source Files\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files\hook</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
