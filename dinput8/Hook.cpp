@@ -37,6 +37,12 @@ void Hook::InitLogging()
 	logging::add_common_attributes();
 	logging::core::get()->add_global_attribute("Scope", boost::log::attributes::named_scope());
 
+	auto logFormat = expr::format("[%1% %2%] %3%: %4%")
+		% expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S")
+		% expr::format_named_scope("Scope", logging::keywords::format = "%C")
+		% logging::trivial::severity
+		% expr::smessage;
+
 	if (enableConsole)
 	{
 		// Create a console for Debug output
@@ -72,15 +78,15 @@ void Hook::InitLogging()
 
 		auto consoleSink = logging::add_console_log(std::cout);
 		consoleSink->set_filter(logging::trivial::severity >= consoleLogLevel);
-		consoleSink->set_formatter(expr::format("[%1% %2%] %3%: %4%")
-			% expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S")
-			% expr::format_named_scope("Scope", logging::keywords::format = "%C")
-			% logging::trivial::severity
-			% expr::smessage);
+		consoleSink->set_formatter(logFormat);
 	}
 
 	if (enableLogFile)
-		logging::add_file_log(config->hook->logPath)->set_filter(logging::trivial::severity >= fileLogLevel);
+	{
+		auto fileSink = logging::add_file_log(config->hook->logPath);
+		fileSink->set_filter(logging::trivial::severity >= fileLogLevel);
+		fileSink->set_formatter(logFormat);
+	}
 }
 
 
