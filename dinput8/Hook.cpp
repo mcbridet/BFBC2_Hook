@@ -1,6 +1,7 @@
 ﻿#include "pch.hpp"
 #include "Hook.hpp"
-#include "Utils.hpp"
+
+#include "PatchSSL.hpp"
 
 DWORD WINAPI HookInit(LPVOID /*lpParameter*/)
 {
@@ -11,15 +12,25 @@ DWORD WINAPI HookInit(LPVOID /*lpParameter*/)
 Hook::Hook()
 {
 	config = &Config::getInstance();
+
+	PatchSSL* sslPatch = &PatchSSL::getInstance();
 	
 	InitLogging();
 	ConsoleIntro();
 
 	BOOST_LOG_FUNCTION()
-	BOOST_LOG_NAMED_SCOPE("Init")
 
 	BOOST_LOG_TRIVIAL(info) << "Initializing...";
-	// TODO
+
+	if (config->hook->patchSSL)
+	{
+		if (!sslPatch->patchSSLVerification())
+		{
+			BOOST_LOG_TRIVIAL(warning) << "Failed to initialize hook! Closing...";
+			ExitProcess(FAILED_TO_PATCH_SSL_CERTIFICATE_VERIFICATION);
+		}
+	}
+
 	BOOST_LOG_TRIVIAL(info) << "Initialized successfully!";
 }
 
