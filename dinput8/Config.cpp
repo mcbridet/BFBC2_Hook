@@ -43,6 +43,7 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	hook->fileLogLevel = pt.get("debug.logLevelFile", boost::log::trivial::debug);
 
 	// Section - Patches
+	hook->verifyGameVersion = pt.get("patches.verifyGameVersion", true);
 	hook->patchDNS = pt.get("patches.patchDNS", true);
 	hook->patchSSL = pt.get("patches.patchSSL", true);
 }

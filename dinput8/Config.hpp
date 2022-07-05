@@ -26,6 +26,7 @@ public:
 		int fileLogLevel; // File message level
 
 		/* Patches */
+		bool verifyGameVersion; // Verify if game version is supported
 		bool patchDNS; // Patch DNS Resolution
 		bool patchSSL; // Patch SSL Verification
 	};
