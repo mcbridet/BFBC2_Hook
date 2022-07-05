@@ -41,4 +41,5 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	hook->logPath = pt.get("debug.logPath", (boost::format("bfbc2_%1%.log") % is.str()).str());
 	hook->consoleLogLevel = pt.get("debug.logLevelConsole", boost::log::trivial::info);
 	hook->fileLogLevel = pt.get("debug.logLevelFile", boost::log::trivial::debug);
+	hook->patchSSL = pt.get("patches.patchSSL", true);
 }

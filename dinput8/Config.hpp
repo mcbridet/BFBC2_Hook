@@ -24,6 +24,9 @@ public:
 
 		int consoleLogLevel; // Console message level
 		int fileLogLevel; // File message level
+
+		/* Patches */
+		bool patchSSL; // Patch SSL Verification
 	};
 
 	HookConfig* hook = new HookConfig();
