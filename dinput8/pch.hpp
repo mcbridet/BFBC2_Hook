@@ -8,7 +8,7 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#include "framework.hpp"
 
 // Standard (Visual) C++
 #include <Unknwn.h>

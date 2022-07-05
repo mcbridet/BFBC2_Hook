@@ -1,6 +1,6 @@
 // dinput8.cpp: Direct Input 8 Hook
-#include "pch.h"
-#include "dinput8.h"
+#include "pch.hpp"
+#include "dinput8.hpp"
 
 DirectInput8Create_t OriginalFunction = nullptr;
 HMODULE OriginalLibrary = nullptr;

@@ -1,6 +1,6 @@
-﻿#include "pch.h"
-#include "Hook.h"
-#include "Utils.h"
+﻿#include "pch.hpp"
+#include "Hook.hpp"
+#include "Utils.hpp"
 
 DWORD WINAPI HookInit(LPVOID /*lpParameter*/)
 {

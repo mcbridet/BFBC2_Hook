@@ -1,7 +1,7 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
-#include "pch.h"
-#include "dinput8.h"
-#include "Hook.h"
+#include "pch.hpp"
+#include "dinput8.hpp"
+#include "Hook.hpp"
 
 void LoadSystemLibrary(const char* libraryName)
 {

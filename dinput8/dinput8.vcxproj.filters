@@ -27,22 +27,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="framework.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="pch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dinput8.h">
+    <ClInclude Include="dinput8.hpp">
       <Filter>Header Files\wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="Hook.h">
+    <ClInclude Include="Hook.hpp">
       <Filter>Header Files\hook</Filter>
     </ClInclude>
-    <ClInclude Include="Config.h">
+    <ClInclude Include="Config.hpp">
       <Filter>Header Files\hook</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
+    <ClInclude Include="Utils.hpp">
       <Filter>Header Files\hook</Filter>
     </ClInclude>
   </ItemGroup>

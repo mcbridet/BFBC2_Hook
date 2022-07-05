@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Config.h"
+#include "Config.hpp"
 
 DWORD WINAPI HookInit(LPVOID lpParameter);
 

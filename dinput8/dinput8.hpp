@@ -1,6 +1,6 @@
 // dinput8.h: Header for Direct Input 8 Hook
 #pragma once
-#include "pch.h"
+#include "pch.hpp"
 
 #define DINPUT8_API __declspec(dllexport)
 

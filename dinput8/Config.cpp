@@ -1,5 +1,5 @@
-﻿#include "pch.h"
-#include "Config.h"
+﻿#include "pch.hpp"
+#include "Config.hpp"
 
 Config::Config()
 {

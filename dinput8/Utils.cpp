@@ -1,5 +1,5 @@
-﻿#include "pch.h"
-#include "Utils.h"
+﻿#include "pch.hpp"
+#include "Utils.hpp"
 
 void Utils::CenterPrint(std::string text, const char* fillChar, bool newLine)
 {

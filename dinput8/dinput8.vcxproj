@@ -98,7 +98,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;DINPUT8_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,12 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="dinput8.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Hook.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Config.hpp" />
+    <ClInclude Include="dinput8.hpp" />
+    <ClInclude Include="framework.hpp" />
+    <ClInclude Include="Hook.hpp" />
+    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
