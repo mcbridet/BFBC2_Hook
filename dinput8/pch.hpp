@@ -26,4 +26,12 @@
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
 
+// Detours
+#include <detours.h>
+#pragma comment(lib, "detours.lib")
+
+// WinSock2
+#include "WinSock2.h"
+#pragma comment(lib, "ws2_32.lib")
+
 #endif //PCH_H
