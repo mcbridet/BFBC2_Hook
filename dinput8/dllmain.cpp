@@ -18,6 +18,19 @@ void LoadSystemLibrary(const char* libraryName)
 			GetProcAddress(OriginalLibrary, "DirectInput8Create"));
 }
 
+void UnprotectGameMemory()
+{
+	HMODULE hModule = GetModuleHandle(NULL);
+
+	PIMAGE_DOS_HEADER header = (PIMAGE_DOS_HEADER)hModule;
+	PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD)hModule + header->e_lfanew);
+
+	// Unprotect the entire PE image
+	SIZE_T size = ntHeader->OptionalHeader.SizeOfImage;
+	DWORD oldProtect;
+	VirtualProtect(hModule, size, PAGE_EXECUTE_READWRITE, &oldProtect);
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule,
                       DWORD ul_reason_for_call,
                       LPVOID lpReserved
@@ -27,6 +40,9 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	{
 		// Load system library so game can use APIs as if it loaded it normally
 		LoadSystemLibrary("dinput8.dll");
+
+		// Unprotect game memory so we can read and write freely
+		UnprotectGameMemory();
 
 		// Launch hook code in new thread
 		CreateThread(nullptr, 0, HookInit, nullptr, 0, nullptr);
