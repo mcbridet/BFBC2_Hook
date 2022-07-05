@@ -25,7 +25,7 @@ bool PatchSSL::patchSSLVerification()
 
 	if (sSSLPatchAddr != NULL)
 	{
-		BOOST_LOG_TRIVIAL(debug) << "Found SSL Certificate Verification code at " << sSSLPatchAddr;
+		BOOST_LOG_TRIVIAL(debug) << "Found SSL Certificate Verification code at " << std::hex << std::uppercase << sSSLPatchAddr;
 
 		*(BYTE*)(sSSLPatchAddr + 2) = 0x15;
 		*(BYTE*)(sSSLPatchAddr + 3) = 0x00;
