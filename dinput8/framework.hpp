@@ -4,4 +4,11 @@
 #define _WIN32_WINNT 0x0502				// Target WinXP SP2
 
 // Windows Header Files
-#include <windows.h>
+#include <Windows.h>
+
+// Standard (Visual) C++
+#include <string>
+
+// Common hook headers
+#include "ExitCode.hpp"
+#include "Utils.hpp"
