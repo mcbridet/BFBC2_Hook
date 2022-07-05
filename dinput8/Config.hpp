@@ -26,6 +26,7 @@ public:
 		int fileLogLevel; // File message level
 
 		/* Patches */
+		bool patchDNS; // Patch DNS Resolution
 		bool patchSSL; // Patch SSL Verification
 	};
 
