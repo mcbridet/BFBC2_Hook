@@ -23,4 +23,6 @@ private:
 
 	static void ConsoleIntro();
     void InitLogging();
+
+    void VerifyGameVersion();
 };
