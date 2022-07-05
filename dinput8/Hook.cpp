@@ -1,6 +1,7 @@
 ﻿#include "pch.hpp"
 #include "Hook.hpp"
 
+#include "PatchDNS.hpp"
 #include "PatchSSL.hpp"
 
 DWORD WINAPI HookInit(LPVOID /*lpParameter*/)
@@ -13,6 +14,7 @@ Hook::Hook()
 {
 	config = &Config::getInstance();
 
+	PatchDNS* dnsPatch = &PatchDNS::getInstance();
 	PatchSSL* sslPatch = &PatchSSL::getInstance();
 	
 	InitLogging();
@@ -22,11 +24,20 @@ Hook::Hook()
 
 	BOOST_LOG_TRIVIAL(info) << "Initializing...";
 
+	if (config->hook->patchDNS)
+	{
+		if (!dnsPatch->patchDNSResolution())
+		{
+			MessageBoxA(NULL, "Failed to initialize hook!\nThe game will now close\n\nMore details in hook log.", "Initialization Failure", MB_OK | MB_ICONWARNING);
+			ExitProcess(FAILED_TO_PATCH_DNS_RESOLUTION);
+		}
+	}
+
 	if (config->hook->patchSSL)
 	{
 		if (!sslPatch->patchSSLVerification())
 		{
-			BOOST_LOG_TRIVIAL(warning) << "Failed to initialize hook! Closing...";
+			MessageBoxA(NULL, "Failed to initialize hook!\nThe game will now close\n\nMore details in hook log.", "Initialization Failure", MB_OK | MB_ICONWARNING);
 			ExitProcess(FAILED_TO_PATCH_SSL_CERTIFICATE_VERIFICATION);
 		}
 	}
