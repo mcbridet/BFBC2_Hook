@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)third_party\boost\include\boost-1_79;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)third_party\boost\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)third_party\boost\include\boost-1_79;$(SolutionDir)third_party\detours\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)third_party\boost\lib;$(SolutionDir)third_party\detours\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,6 +148,7 @@
     <ClInclude Include="ExitCode.hpp" />
     <ClInclude Include="framework.hpp" />
     <ClInclude Include="Hook.hpp" />
+    <ClInclude Include="PatchDNS.hpp" />
     <ClInclude Include="PatchSSL.hpp" />
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="Utils.hpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="dinput8.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Hook.cpp" />
+    <ClCompile Include="PatchDNS.cpp" />
     <ClCompile Include="PatchSSL.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
