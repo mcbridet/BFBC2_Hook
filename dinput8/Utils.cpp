@@ -100,3 +100,32 @@ DWORD Utils::OffsetToCode(HANDLE hHandle)
 
 	return pOptionalHeader->BaseOfCode;
 }
+
+UINT Utils::DecodeInt(unsigned char* data, int bytes)
+{
+	int num, i;
+
+	for (num = i = 0; i < bytes; i++)
+		// num |= (data[i] << (i << 3)); // little endian
+		num |= (data[i] << ((bytes - 1 - i) << 3)); // big endian
+
+	return num;
+}
+
+std::string Utils::GetPacketData(std::string data)
+{
+	std::string final_str;
+
+	const boost::char_separator<char> token_sep("\n");
+
+	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+	tokenizer tokens(data, token_sep);
+
+	BOOST_FOREACH(std::string const& token, tokens)
+	{
+		final_str += token;
+		final_str += ", ";
+	}
+
+	return final_str.substr(0, final_str.size() - 2);
+}

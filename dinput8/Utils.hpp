@@ -9,4 +9,7 @@ public:
     static DWORD FindPattern(DWORD dwStart, DWORD dwLen, BYTE* pszPatt, const char pszMask[]);
     static DWORD OffsetToCode(HANDLE hHandle);
     static DWORD GetSizeOfCode(HANDLE hHandle);
+
+    static UINT DecodeInt(unsigned char* data, int bytes);
+    static std::string GetPacketData(std::string data);
 };
