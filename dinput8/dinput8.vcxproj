@@ -107,6 +107,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)third_party\openssl\bin\libeay32.dll" "$(TargetDir)libeay32.dll"
+copy /Y "$(SolutionDir)third_party\openssl\bin\ssleay32.dll" "$(TargetDir)ssleay32.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
