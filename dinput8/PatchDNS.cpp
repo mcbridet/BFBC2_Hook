@@ -44,4 +44,5 @@ bool PatchDNS::patchDNSResolution()
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "Successfully patched DNS Resolution...";
+	return TRUE;
 }
