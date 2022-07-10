@@ -29,6 +29,10 @@ public:
 		bool verifyGameVersion; // Verify if game version is supported
 		bool patchDNS; // Patch DNS Resolution
 		bool patchSSL; // Patch SSL Verification
+
+		/* Proxy */
+		bool proxyEnable; // Enable proxy
+		bool connectRetail; // Connect to retail
 	};
 
 	HookConfig* hook = new HookConfig();

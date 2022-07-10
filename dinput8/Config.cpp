@@ -46,4 +46,8 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	hook->verifyGameVersion = pt.get("patches.verifyGameVersion", true);
 	hook->patchDNS = pt.get("patches.patchDNS", true);
 	hook->patchSSL = pt.get("patches.patchSSL", true);
+
+	// Section - Proxy
+	hook->proxyEnable = pt.get("proxy.enable", true);
+	hook->connectRetail = pt.get("proxy.connectToRetail", false);
 }
