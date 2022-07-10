@@ -194,19 +194,18 @@ void ConnectionFESL::retail_handle_read(const boost::system::error_code& error, 
 	{
 		send_length = bytes_transferred;
 
-		// For some reason retail server sends first byte in separate packet, sometimes o_O
-		if (send_length < HEADER_LENGTH)
+		if (send_data[(send_length + receivedDataOffset) - 1] != NULL)
 		{
-			unwatchedSize += send_length;
-			retail_socket_.async_read_some(buffer(send_data + send_length, PACKET_MAX_LENGTH - send_length), bind(&ConnectionFESL::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+			receivedDataOffset += send_length;
+			retail_socket_.async_read_some(buffer(send_data + receivedDataOffset, PACKET_MAX_LENGTH - receivedDataOffset), bind(&ConnectionFESL::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 			return;
 		}
 
 		async_write(game_socket_,
-			buffer(send_data, send_length + unwatchedSize),
+			buffer(send_data, send_length + receivedDataOffset),
 			boost::bind(&ConnectionFESL::handle_write, shared_from_this(), placeholders::error));
 
-		unwatchedSize = 0;
+		receivedDataOffset = NULL;
 		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionFESL::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 	}
 	else

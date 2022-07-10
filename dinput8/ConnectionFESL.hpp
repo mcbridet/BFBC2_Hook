@@ -37,7 +37,7 @@ private:
 	unsigned char received_data[PACKET_MAX_LENGTH];
 	unsigned int received_length;
 
-	int unwatchedSize = 0;
+	int receivedDataOffset = 0;
 
 	unsigned char send_data[PACKET_MAX_LENGTH];
 	unsigned int send_length;
