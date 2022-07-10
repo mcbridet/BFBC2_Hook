@@ -25,6 +25,11 @@
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/foreach.hpp>
+#include <boost/thread/thread.hpp>
 
 // Detours
 #include <detours.h>
