@@ -39,4 +39,8 @@
 #include "WinSock2.h"
 #pragma comment(lib, "ws2_32.lib")
 
+// OpenSSL
+#pragma comment(lib, "ssleay32.lib")
+#pragma comment(lib, "libeay32.lib")
+
 #endif //PCH_H
