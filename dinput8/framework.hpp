@@ -21,3 +21,5 @@
 // Common hook headers
 #include "ExitCode.hpp"
 #include "Utils.hpp"
+#include "ProxyCert.hpp"
+#include "ExecutableType.hpp"
