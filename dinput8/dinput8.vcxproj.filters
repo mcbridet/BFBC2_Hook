@@ -25,6 +25,18 @@
     <Filter Include="Source Files\hook">
       <UniqueIdentifier>{07f5bf83-f28d-4dfe-ae76-67685805383e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\proxy">
+      <UniqueIdentifier>{b9b6b2fc-04a7-4582-96d6-9db4c7c2a61e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\proxy">
+      <UniqueIdentifier>{a2f465d3-320e-4d8b-8c27-cfa5039ef2ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\proxy\connection">
+      <UniqueIdentifier>{2ecbfceb-934c-4307-a7a6-f17bfe97390b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\proxy\connection">
+      <UniqueIdentifier>{e59f51c4-8670-4f66-acd4-4c2a918e83a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.hpp">
@@ -54,6 +66,24 @@
     <ClInclude Include="PatchDNS.hpp">
       <Filter>Header Files\hook</Filter>
     </ClInclude>
+    <ClInclude Include="ProxyCert.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="Proxy.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutableType.hpp">
+      <Filter>Header Files\hook</Filter>
+    </ClInclude>
+    <ClInclude Include="ProxyTCP.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionFESL.hpp">
+      <Filter>Header Files\proxy\connection</Filter>
+    </ClInclude>
+    <ClInclude Include="ProxyClient.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -79,6 +109,18 @@
     </ClCompile>
     <ClCompile Include="PatchDNS.cpp">
       <Filter>Source Files\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="Proxy.cpp">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyTCP.cpp">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionFESL.cpp">
+      <Filter>Source Files\proxy\connection</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyClient.cpp">
+      <Filter>Source Files\proxy</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
