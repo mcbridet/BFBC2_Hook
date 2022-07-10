@@ -18,6 +18,8 @@ public:
         return *_instance;
     }
 
+    EXECUTABLE_TYPE exeType;
+
 private:
     Config* config;
 

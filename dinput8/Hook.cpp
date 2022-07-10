@@ -3,6 +3,7 @@
 
 #include "PatchDNS.hpp"
 #include "PatchSSL.hpp"
+#include "Proxy.hpp"
 
 DWORD WINAPI HookInit(LPVOID /*lpParameter*/)
 {
@@ -24,8 +25,7 @@ Hook::Hook()
 
 	BOOST_LOG_TRIVIAL(info) << "Initializing...";
 
-	if (config->hook->verifyGameVersion)
-		VerifyGameVersion();
+	VerifyGameVersion();
 
 	if (config->hook->patchDNS)
 	{
@@ -46,6 +46,9 @@ Hook::Hook()
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "Initialized successfully!";
+
+	if (config->hook->proxyEnable)
+		CreateThread(nullptr, 0, ProxyInit, nullptr, 0, nullptr);
 }
 
 void Hook::InitLogging()
@@ -127,7 +130,7 @@ void Hook::ConsoleIntro()
 
 void Hook::VerifyGameVersion()
 {
-	BOOST_LOG_NAMED_SCOPE("VerifyGameVersion")
+	BOOST_LOG_NAMED_SCOPE("GameVersion")
 
 	// "ROMEPC795745" - Client R11
 	DWORD mClientVersionAddr = Utils::FindPattern(0x1400000, 0x600000, (BYTE*)"\x22\x52\x4F\x4D\x45\x50\x43\x37\x39\x35\x37\x34\x35\x22", "xxxxxxxxxxxxxx");
@@ -135,7 +138,7 @@ void Hook::VerifyGameVersion()
 	// "ROMEPC851434" - Server R34
 	DWORD mServerVersionAddr = Utils::FindPattern(0x1600000, 0x600000, (BYTE*)"\x22\x52\x4F\x4D\x45\x50\x43\x38\x35\x31\x34\x33\x34\x22", "xxxxxxxxxxxxxx");
 
-	if (mClientVersionAddr == NULL && mServerVersionAddr == NULL)
+	if (config->hook->verifyGameVersion && (mClientVersionAddr == NULL && mServerVersionAddr == NULL))
 	{
 		MessageBoxA(NULL, "Failed to initialize hook!\r\nUnknown client/server detected!\r\nPlease verify the integrity of your files and try again.", "Initialization Failure", MB_OK | MB_ICONWARNING);
 		ExitProcess(INVALID_GAME_VERSION);
@@ -144,9 +147,20 @@ void Hook::VerifyGameVersion()
 	std::string exeType;
 
 	if (mClientVersionAddr != NULL)
+	{
 		exeType = "Client";
-	else
+		this->exeType = CLIENT;
+	}
+	else if (mServerVersionAddr != NULL)
+	{
 		exeType = "Server";
+		this->exeType = SERVER;
+	}
+	else
+	{
+		exeType = "!!!!!! UNKNOWN !!!!!!";
+		this->exeType = UNKNOWN;
+	}
 
 	BOOST_LOG_TRIVIAL(info) << "Detected executable type: " << exeType;
 }
