@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)third_party\boost\include\boost-1_79;$(SolutionDir)third_party\detours\include;$(SolutionDir)third_party\openssl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)third_party\boost\include\boost-1_80;$(SolutionDir)third_party\detours\include;$(SolutionDir)third_party\openssl\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)third_party\boost\lib;$(SolutionDir)third_party\detours\lib;$(SolutionDir)third_party\openssl\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
