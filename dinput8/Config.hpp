@@ -33,6 +33,9 @@ public:
 		/* Proxy */
 		bool proxyEnable; // Enable proxy
 		bool connectRetail; // Connect to retail
+		std::string serverAddress; // Server Address (e.g bfbc2.grzyb.dev)
+		USHORT serverPort; // Server Port (e.g. 443)
+		bool serverSecure; // If true - use WSS, else - use WS
 	};
 
 	HookConfig* hook = new HookConfig();
