@@ -43,4 +43,8 @@
 #pragma comment(lib, "ssleay32.lib")
 #pragma comment(lib, "libeay32.lib")
 
+// Cpprestsdk
+#include <cpprest/ws_client.h>
+#pragma comment(lib, "cpprest143_2_10.lib")
+
 #endif //PCH_H
