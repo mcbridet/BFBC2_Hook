@@ -1,4 +1,4 @@
-#include "pch.hpp"
+﻿#include "pch.hpp"
 #include "ConnectionFESL.hpp"
 
 #include "Config.hpp"
@@ -7,6 +7,8 @@
 
 using namespace boost::asio;
 using namespace ip;
+using namespace web;
+using namespace web::websockets::client;
 
 ConnectionFESL::ConnectionFESL(io_service& io_service, ssl::context& context) : game_socket_(io_service, context), retail_socket_(io_service, context)
 {
@@ -38,7 +40,7 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 
 	if (!error)
 	{
-		BOOST_LOG_TRIVIAL(debug) << "New connection from: " << getRemoteIp() << ":" << getRemotePort();
+		BOOST_LOG_TRIVIAL(debug) << "New connection, initializing...";
 
 		if (config->hook->connectRetail)
 		{
@@ -54,8 +56,86 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 
 			async_connect(retailSocket(), iterator, bind(&ConnectionFESL::retail_handle_connect, shared_from_this(), placeholders::error));
 		}
+		else
+		{
+			std::wstring wsFinalPath = config->hook->serverSecure ? L"wss://" : L"ws://";
+			wsFinalPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
+			wsFinalPath += L":";
+			wsFinalPath += std::to_wstring(config->hook->serverPort);
+			wsFinalPath += L"/fesl/";
+			wsFinalPath += (hook->exeType == CLIENT) ? L"client" : L"server";
+
+			BOOST_LOG_TRIVIAL(info) << "Connecting to " << wsFinalPath << "...";
+
+			ws.set_message_handler([this](websocket_incoming_message msg) {
+				try {
+					switch (msg.message_type())
+					{
+						case websocket_message_type::text_message:
+						{
+							std::string server_message = msg.extract_string().get();
+							BOOST_LOG_TRIVIAL(info) << server_message;
+							break;
+						}
+						case websocket_message_type::binary_message:
+						{
+							auto incoming_data_raw = msg.body();
+							concurrency::streams::container_buffer<std::vector<uint8_t>> incoming_data;
+							incoming_data_raw.read_to_end(incoming_data).wait();
+
+							std::vector<uint8_t> read_data = incoming_data.collection();
+							std::fill_n(send_data, PACKET_MAX_LENGTH, 0);
+							memcpy(send_data, read_data.data(), read_data.size());
+
+							send_length = read_data.size();
+							incoming_data.close();
+
+							async_write(game_socket_, buffer(send_data, send_length),
+								boost::bind(&ConnectionFESL::handle_write, shared_from_this(), placeholders::error));
+							break;
+						}
+						case websocket_message_type::ping:
+						{
+							auto ping_body = msg.body();
+							concurrency::streams::container_buffer<std::vector<uint8_t>> incoming_ping;
+							ping_body.read_to_end(incoming_ping).wait();
+
+							std::vector<uint8_t> ping_buf = incoming_ping.collection();
+							auto ping_data = new char[ping_buf.size()];
+							memcpy(ping_data, ping_buf.data(), ping_buf.size());
+
+							websocket_outgoing_message pong;
+							pong.set_pong_message(ping_data);
+
+							ws.send(pong);
+							break;
+						}
+					}
+				}
+				catch (const websocket_exception& ex)
+				{
+					BOOST_LOG_TRIVIAL(error) << "[WebSocket Message Handler]: Failed to read from websocket! (" << ex.what() << ")";
+				}
+			});
+
+			ws.set_close_handler([this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error) {
+				BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << (int)close_status << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
+				handle_stop(true);
+			});
+
+			try
+			{
+				ws.connect(wsFinalPath).wait();
+			}
+			catch (const websocket_exception& ex)
+			{
+				BOOST_LOG_TRIVIAL(error) << "Failed to connect to server! (" << ex.what() << ")";
+				return;
+			}
+		}
 
 		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionFESL::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		BOOST_LOG_TRIVIAL(info) << "Client connected";
 	}
 	else
 	{
@@ -94,9 +174,31 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 			async_write(retail_socket_, buffer(received_data, received_length),
 				boost::bind(&ConnectionFESL::retail_handle_write, shared_from_this(), placeholders::error));
 		}
+		else
+		{
+			try
+			{
+				auto packet_data = new char[received_length];
+				memcpy(packet_data, received_data, received_length);
+
+				std::string msgcontent = std::string(packet_data, received_length);
+				std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
+
+				auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
+
+				websocket_outgoing_message msg;
+				msg.set_binary_message(is);
+
+				ws.send(msg);
+			}
+			catch (const websocket_exception& ex)
+			{
+				BOOST_LOG_TRIVIAL(error) << "handle_read() - Failed to write to websocket! (" << ex.what() << ")";
+				return handle_stop(true);
+			}
+		}
 
 		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionFESL::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
-
 	}
 	else
 	{
@@ -225,12 +327,19 @@ void ConnectionFESL::handle_stop(bool graceful_disconnect)
 		retail_socket_.shutdown();
 	}
 
-	if (!graceful_disconnect)
+	if (!graceful_disconnect && !config->hook->connectRetail)
 	{
-		
+		if (!config->hook->connectRetail)
+			ws.close();
 	}
-	else
+
+	try {
+		game_socket_.shutdown();
+	}
+	catch (std::exception& e)
 	{
-		BOOST_LOG_TRIVIAL(info) << "[" << getRemoteIp() << ":" << getRemotePort() << " Disconnected!";
+
 	}
+
+	BOOST_LOG_TRIVIAL(info) << "Client Disconnected!";
 }

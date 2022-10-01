@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socketSSL;
 
@@ -14,6 +14,8 @@ public:
 	void start();
 
 private:
+	web::websockets::client::websocket_callback_client ws;
+
 	socketSSL game_socket_;
 	socketSSL retail_socket_;
 
