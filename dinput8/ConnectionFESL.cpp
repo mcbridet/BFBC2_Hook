@@ -136,16 +136,6 @@ void ConnectionFESL::handle_write(const boost::system::error_code& error)
 	}
 }
 
-std::string ConnectionFESL::getRemoteIp()
-{
-	return gameSocket().remote_endpoint().address().to_string();
-}
-
-USHORT ConnectionFESL::getRemotePort()
-{
-	return gameSocket().remote_endpoint().port();
-}
-
 void ConnectionFESL::retail_handle_connect(const boost::system::error_code& error)
 {
 	BOOST_LOG_NAMED_SCOPE("retail_handle_connect")

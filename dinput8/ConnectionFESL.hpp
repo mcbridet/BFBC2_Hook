@@ -29,9 +29,6 @@ private:
 
 	bool connected_to_retail = false;
 
-	std::string getRemoteIp();
-	USHORT getRemotePort();
-
 	unsigned char received_data[PACKET_MAX_LENGTH];
 	unsigned int received_length;
 
