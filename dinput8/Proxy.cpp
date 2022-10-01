@@ -26,31 +26,23 @@ Proxy::Proxy()
 			io_service io_service;
 
 			USHORT feslPort;
-			std::wstring feslPath;
 			USHORT theaterPort;
-			std::wstring theaterPath;
 
 			if (hook->exeType == CLIENT)
 			{
 				feslPort = CLIENT_FESL_PORT;
-				feslPath = L"/fesl/client";
-
 				theaterPort = CLIENT_THEATER_PORT;
-				theaterPath = L"/theater/client";
 			}
 			else if (hook->exeType == SERVER)
 			{
 				feslPort = SERVER_FESL_PORT;
-				feslPath = L"/fesl/server";
-
 				theaterPort = SERVER_THEATER_PORT;
-				theaterPath = L"/theater/server";
 			}
 			else
 				return;
 
 			BOOST_LOG_TRIVIAL(info) << "Initializing...";
-			ProxyTCP* feslProxy = new ProxyTCP(io_service, feslPort, true, feslPath);
+			ProxyTCP* feslProxy = new ProxyTCP(io_service, feslPort, true);
 
 			if (config->hook->connectRetail)
 			{

@@ -1,4 +1,4 @@
-﻿#include "pch.hpp"
+#include "pch.hpp"
 #include "ConnectionFESL.hpp"
 
 #include "Config.hpp"
@@ -8,11 +8,9 @@
 using namespace boost::asio;
 using namespace ip;
 
-ConnectionFESL::ConnectionFESL(io_service& io_service, ssl::context& context, std::wstring wsPath) : game_socket_(io_service, context), retail_socket_(io_service, context)
+ConnectionFESL::ConnectionFESL(io_service& io_service, ssl::context& context) : game_socket_(io_service, context), retail_socket_(io_service, context)
 {
 	BOOST_LOG_FUNCTION()
-
-	wsPath_ = wsPath;
 }
 
 socketSSL::lowest_layer_type& ConnectionFESL::gameSocket()

@@ -5,13 +5,12 @@ using namespace boost;
 using namespace asio;
 using ip::tcp;
 
-ProxyTCP::ProxyTCP(io_service& io_service, USHORT port, bool secure, std::wstring wsPath) : acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), context_(ssl::context::sslv23)
+ProxyTCP::ProxyTCP(io_service& io_service, USHORT port, bool secure) : acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), context_(ssl::context::sslv23)
 {
 	BOOST_LOG_FUNCTION();
 
 	port_ = port;
 	secure_ = secure;
-	wsPath_ = wsPath;
 
 	if (secure)
 	{
@@ -31,7 +30,7 @@ void ProxyTCP::start_accept()
 {
 	if (secure_)
 	{
-		new_fesl_connection.reset(new ConnectionFESL((io_context&)acceptor_.get_executor().context(), context_, wsPath_));
+		new_fesl_connection.reset(new ConnectionFESL((io_context&)acceptor_.get_executor().context(), context_));
 		acceptor_.async_accept(new_fesl_connection->gameSocket(), bind(&ProxyTCP::handle_accept_fesl, this, asio::placeholders::error));
 	}
 	else

@@ -1,11 +1,11 @@
-﻿#pragma once
+#pragma once
 
 typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socketSSL;
 
 class ConnectionFESL : public boost::enable_shared_from_this<ConnectionFESL>, boost::asio::noncopyable
 {
 public:
-	ConnectionFESL(boost::asio::io_service& io_service, boost::asio::ssl::context& context, std::wstring wsPath);
+	ConnectionFESL(boost::asio::io_service& io_service, boost::asio::ssl::context& context);
 	typedef boost::shared_ptr<ConnectionFESL> pointer;
 
 	socketSSL::lowest_layer_type& gameSocket();
@@ -16,8 +16,6 @@ public:
 private:
 	socketSSL game_socket_;
 	socketSSL retail_socket_;
-
-	std::wstring wsPath_;
 
 	void handle_handshake(const boost::system::error_code& error);						// first sequence of packets for ssl connection
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred); // normal read
