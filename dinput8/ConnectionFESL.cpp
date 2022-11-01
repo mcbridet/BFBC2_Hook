@@ -169,10 +169,13 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 
 		BOOST_LOG_TRIVIAL(debug) << boost::format("-> %s %08x%08x {%s}") % packet_category % packet_type % packet_length % packet_data;
 
-		if (config->hook->connectRetail && connected_to_retail)
+		if (config->hook->connectRetail)
 		{
-			async_write(retail_socket_, buffer(received_data, received_length),
-				boost::bind(&ConnectionFESL::retail_handle_write, shared_from_this(), placeholders::error));
+			if (connected_to_retail)
+			{
+				async_write(retail_socket_, buffer(received_data, received_length),
+					boost::bind(&ConnectionFESL::retail_handle_write, shared_from_this(), placeholders::error));
+			}
 		}
 		else
 		{
@@ -336,7 +339,7 @@ void ConnectionFESL::handle_stop(bool graceful_disconnect)
 	try {
 		game_socket_.shutdown();
 	}
-	catch (std::exception& e)
+	catch (std::exception&)
 	{
 
 	}
