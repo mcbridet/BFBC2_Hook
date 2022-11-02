@@ -50,7 +50,17 @@ jobs:
           set BUILD_PATH=%CD%
           popd
           perl Configure VC-WIN32 --prefix=%BUILD_PATH% enable-ssl2 && ms\do_nasm && nmake -f ms\ntdll.mak && nmake -f ms\ntdll.mak test && nmake -f ms\ntdll.mak install
-      
+          
+      - name: Build OpenSSL (New)
+        working-directory: ./external/openssl_new
+        shell: cmd
+        run: |
+          mkdir ..\..\third_party\openssl_new
+          pushd ..\..\third_party\openssl_new
+          set BUILD_PATH=%CD%
+          popd
+          perl Configure VC-WIN32 --prefix=%BUILD_PATH% && nmake && nmake test && nmake install
+
       - name: Build ZLIB
         working-directory: ./external/zlib
         shell: cmd
@@ -64,12 +74,12 @@ jobs:
         run: |
           mkdir ..\..\third_party\cpprestsdk\
           mkdir ..\..\third_party\cpprestsdk\lib
-          mklink ..\..\third_party\cpprestsdk\lib\libeay32.lib ..\..\openssl\lib\libeay32.lib
-          mklink ..\..\third_party\cpprestsdk\lib\ssleay32.lib ..\..\openssl\lib\ssleay32.lib
+          mklink ..\..\third_party\cpprestsdk\lib\libcrypto.lib ..\..\openssl_new\lib\libcrypto.lib
+          mklink ..\..\third_party\cpprestsdk\lib\libssl.lib ..\..\openssl_new\lib\libssl.lib
           pushd ..\..\third_party\zlib\lib
           set ZLIB_FILE_PATH=%CD%\zlib.lib
           popd
-          cmake -A Win32 -DBOOST_ROOT=..\..\third_party\boost\ -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_INCLUDE_DIR=..\..\third_party\openssl\include -DOPENSSL_LIBRARIES=..\..\third_party\openssl\lib -DZLIB_LIBRARY=%ZLIB_FILE_PATH% -DZLIB_INCLUDE_DIR=..\..\third_party\zlib\include -DCMAKE_INSTALL_PREFIX=..\..\third_party\cpprestsdk .
+          cmake -A Win32 -DBOOST_ROOT=..\..\third_party\boost\ -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_INCLUDE_DIR=..\..\third_party\openssl_new\include -DOPENSSL_LIBRARIES=..\..\third_party\openssl_new\lib -DZLIB_LIBRARY=%ZLIB_FILE_PATH% -DZLIB_INCLUDE_DIR=..\..\third_party\zlib\include -DCMAKE_INSTALL_PREFIX=..\..\third_party\cpprestsdk .
           msbuild INSTALL.vcxproj /p:Configuration=Release /p:Platform=Win32
       
       - name: Build Detours
