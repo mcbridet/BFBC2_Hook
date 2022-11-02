@@ -110,6 +110,8 @@
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)third_party\openssl\bin\libeay32.dll" "$(TargetDir)libeay32.dll"
 copy /Y "$(SolutionDir)third_party\openssl\bin\ssleay32.dll" "$(TargetDir)ssleay32.dll"
+copy /Y "$(SolutionDir)third_party\openssl_new\bin\libcrypto-1_1.dll" "$(TargetDir)libcrypto-1_1.dll"
+copy /Y "$(SolutionDir)third_party\openssl_new\bin\libssl-1_1.dll" "$(TargetDir)libssl-1_1.dll"
 copy /Y "$(SolutionDir)third_party\cpprestsdk\bin\cpprest143_2_10.dll" "$(TargetDir)cpprest143_2_10.dll"
 copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Command>
     </PostBuildEvent>
