@@ -13,3 +13,6 @@
 [submodule "external/detours"]
 	path = external/detours
 	url = https://github.com/microsoft/Detours.git
+[submodule "external/openssl_new"]
+	path = external/openssl_new
+	url = https://github.com/openssl/openssl.git
