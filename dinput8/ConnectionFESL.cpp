@@ -120,12 +120,13 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 
 			ws.set_close_handler([this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error) {
 				BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << (int)close_status << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
-				handle_stop(true);
+				handle_stop();
 			});
 
 			try
 			{
 				ws.connect(wsFinalPath).wait();
+				connected_to_ws = true;
 			}
 			catch (const websocket_exception& ex)
 			{
@@ -134,12 +135,14 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 			}
 		}
 
+		connected_to_game = true;
 		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionFESL::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 		BOOST_LOG_TRIVIAL(info) << "Client connected";
 	}
 	else
 	{
 		BOOST_LOG_TRIVIAL(info) << "Disconnected, error message: " << error.message() << ", error code: " << error.value();
+		handle_stop();
 	}
 }
 
@@ -197,7 +200,7 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 			catch (const websocket_exception& ex)
 			{
 				BOOST_LOG_TRIVIAL(error) << "handle_read() - Failed to write to websocket! (" << ex.what() << ")";
-				return handle_stop(true);
+				return handle_stop();
 			}
 		}
 
@@ -206,7 +209,7 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 	else
 	{
 		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
-		handle_stop(false);
+		handle_stop();
 	}
 }
 
@@ -237,7 +240,7 @@ void ConnectionFESL::handle_write(const boost::system::error_code& error)
 	else
 	{
 		BOOST_LOG_TRIVIAL(info) << "Disconnected, error message: " << error.message() << ", error code: " << error.value();
-		handle_stop(false);
+		handle_stop();
 	}
 }
 
@@ -254,7 +257,7 @@ void ConnectionFESL::retail_handle_connect(const boost::system::error_code& erro
 	else
 	{
 		BOOST_LOG_TRIVIAL(error) << "Connection to retail server failed! (" << error.message() << ")";
-		handle_stop(false);
+		handle_stop();
 	}
 }
 
@@ -275,7 +278,7 @@ void ConnectionFESL::retail_handle_handshake(const boost::system::error_code& er
 	else
 	{
 		BOOST_LOG_TRIVIAL(error) << "Handshake with retail server failed! (" << error.message() << ")";
-		handle_stop(false);
+		handle_stop();
 	}
 }
 
@@ -304,7 +307,7 @@ void ConnectionFESL::retail_handle_read(const boost::system::error_code& error, 
 	else
 	{
 		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
-		handle_stop(false);
+		handle_stop();
 	}
 }
 
@@ -315,33 +318,38 @@ void ConnectionFESL::retail_handle_write(const boost::system::error_code& error)
 	if (error)
 	{
 		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
-		handle_stop(false);
+		handle_stop();
 	}
 }
 
 
-void ConnectionFESL::handle_stop(bool graceful_disconnect)
+void ConnectionFESL::handle_stop()
 {
-	Config* config = &Config::getInstance();
+	BOOST_LOG_NAMED_SCOPE("handle_stop")
 
-	if (config->hook->connectRetail)
+	BOOST_LOG_TRIVIAL(error) << "Stopping...";
+	if (connected_to_retail)
 	{
+		BOOST_LOG_TRIVIAL(error) << "Stopping retail socket...";
+
 		connected_to_retail = false;
 		retail_socket_.shutdown();
 	}
 
-	if (!graceful_disconnect && !config->hook->connectRetail)
+	if (connected_to_ws)
 	{
-		if (!config->hook->connectRetail)
-			ws.close();
+		BOOST_LOG_TRIVIAL(error) << "Stopping ws socket...";
+
+		connected_to_ws = false;
+		ws.close();
 	}
 
-	try {
+	if (connected_to_game)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Stopping game socket...";
+
+		connected_to_game = false;
 		game_socket_.shutdown();
-	}
-	catch (std::exception&)
-	{
-
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "Client Disconnected!";

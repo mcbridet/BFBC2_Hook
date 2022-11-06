@@ -22,13 +22,15 @@ private:
 	void handle_handshake(const boost::system::error_code& error);						// first sequence of packets for ssl connection
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred); // normal read
 	void handle_write(const boost::system::error_code& error);							// normal send (also deals with multiple packets)
-	void handle_stop(bool graceful_disconnect);											// cleanup after a disconnect
+	void handle_stop();																	// cleanup after a disconnect
 
 	void retail_handle_connect(const boost::system::error_code& error);
 	void retail_handle_handshake(const boost::system::error_code& error);
 	void retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred);
 	void retail_handle_write(const boost::system::error_code& error);
 
+	bool connected_to_ws = false;
+	bool connected_to_game = false;
 	bool connected_to_retail = false;
 
 	unsigned char received_data[PACKET_MAX_LENGTH];
