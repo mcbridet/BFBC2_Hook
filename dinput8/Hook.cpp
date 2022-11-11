@@ -19,10 +19,8 @@ Hook::Hook()
 	PatchSSL* sslPatch = &PatchSSL::getInstance();
 	
 	InitLogging();
-	ConsoleIntro();
 
 	BOOST_LOG_FUNCTION()
-
 	BOOST_LOG_TRIVIAL(info) << "Initializing...";
 
 	VerifyGameVersion();
@@ -107,6 +105,8 @@ void Hook::InitLogging()
 		auto consoleSink = logging::add_console_log(std::cout);
 		consoleSink->set_filter(logging::trivial::severity >= consoleLogLevel);
 		consoleSink->set_formatter(logFormat);
+
+		ConsoleIntro();
 	}
 
 	if (enableLogFile)
