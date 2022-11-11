@@ -12,14 +12,24 @@ void Config::readConfig() const
 	using boost::property_tree::ptree;
 	ptree pt;
 
+	std::string configPath = "grzybdev.conf";
+
 	try
 	{
-		read_json("grzybdev.conf", pt);
+		read_json(configPath, pt);
 	}
-	catch (boost::property_tree::json_parser_error)
+	catch (boost::property_tree::json_parser_error e)
 	{
-		// Do nothing in case of file read error
-		// Will use defaults
+		// Will use defaults in case of parse error
+
+		if (boost::filesystem::exists(configPath)) {
+			// Print parse error only if it's actual parse error
+			std::wstring errMessage = std::wstring(e.message().begin(), e.message().end());
+			std::wstring message = L"Hook will use default configs because error occured while parsing config file: ";
+			message += errMessage;
+
+			MessageBox(NULL, message.c_str(), L"Config Parse Error", MB_ICONEXCLAMATION | MB_OK);
+		}
 	}
 
 	parseConfig(pt);

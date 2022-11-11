@@ -30,6 +30,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/filesystem.hpp>
 
 // Detours
 #include <detours.h>
