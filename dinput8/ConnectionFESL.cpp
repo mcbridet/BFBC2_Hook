@@ -327,29 +327,22 @@ void ConnectionFESL::handle_stop()
 {
 	BOOST_LOG_NAMED_SCOPE("handle_stop")
 
-	BOOST_LOG_TRIVIAL(error) << "Stopping...";
 	if (connected_to_retail)
 	{
-		BOOST_LOG_TRIVIAL(error) << "Stopping retail socket...";
-
 		connected_to_retail = false;
-		retail_socket_.shutdown();
+		retail_socket_.lowest_layer().close();
 	}
 
 	if (connected_to_ws)
 	{
-		BOOST_LOG_TRIVIAL(error) << "Stopping ws socket...";
-
 		connected_to_ws = false;
 		ws.close();
 	}
 
 	if (connected_to_game)
 	{
-		BOOST_LOG_TRIVIAL(error) << "Stopping game socket...";
-
 		connected_to_game = false;
-		game_socket_.shutdown();
+		game_socket_.lowest_layer().close();
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "Client Disconnected!";
