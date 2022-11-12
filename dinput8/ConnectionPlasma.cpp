@@ -1,5 +1,5 @@
 ﻿#include "pch.hpp"
-#include "ConnectionFESL.hpp"
+#include "ConnectionPlasma.hpp"
 
 #include "Config.hpp"
 #include "Hook.hpp"
@@ -10,28 +10,28 @@ using namespace ip;
 using namespace web;
 using namespace web::websockets::client;
 
-ConnectionFESL::ConnectionFESL(io_service& io_service, ssl::context& context) : game_socket_(io_service, context), retail_socket_(io_service, context)
+ConnectionPlasma::ConnectionPlasma(io_service& io_service, ssl::context& context) : game_socket_(io_service, context), retail_socket_(io_service, context)
 {
 	BOOST_LOG_FUNCTION()
 }
 
-socketSSL::lowest_layer_type& ConnectionFESL::gameSocket()
+socketSSL::lowest_layer_type& ConnectionPlasma::gameSocket()
 {
 	return game_socket_.lowest_layer();
 }
 
-socketSSL::lowest_layer_type& ConnectionFESL::retailSocket()
+socketSSL::lowest_layer_type& ConnectionPlasma::retailSocket()
 {
 	return retail_socket_.lowest_layer();
 }
 
-void ConnectionFESL::start()
+void ConnectionPlasma::start()
 {
 	// Before reading stuff we have to do a handshake
-	game_socket_.async_handshake(ssl::stream_base::server, bind(&ConnectionFESL::handle_handshake, shared_from_this(), placeholders::error));
+	game_socket_.async_handshake(ssl::stream_base::server, bind(&ConnectionPlasma::handle_handshake, shared_from_this(), placeholders::error));
 }
 
-void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
+void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 {
 	BOOST_LOG_NAMED_SCOPE("handle_handshake")
 
@@ -47,14 +47,14 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 			ProxyClient* proxyClient = &ProxyClient::getInstance();
 
 			std::string host = hook->exeType == CLIENT ? "bfbc2-pc.fesl.ea.com" : "bfbc2-pc-server.fesl.ea.com";
-			std::string port = std::to_string(hook->exeType == CLIENT ? CLIENT_FESL_PORT : SERVER_FESL_PORT);
+			std::string port = std::to_string(hook->exeType == CLIENT ? CLIENT_PLASMA_PORT : SERVER_PLASMA_PORT);
 
 			BOOST_LOG_TRIVIAL(warning) << "Connecting to retail server (" << host << ":" << port << ")...";
 
 			tcp::resolver::query query(host, port);
-			tcp::resolver::iterator iterator = proxyClient->feslResolver->resolve(query);
+			tcp::resolver::iterator iterator = proxyClient->plasmaResolver->resolve(query);
 
-			async_connect(retailSocket(), iterator, bind(&ConnectionFESL::retail_handle_connect, shared_from_this(), placeholders::error));
+			async_connect(retailSocket(), iterator, bind(&ConnectionPlasma::retail_handle_connect, shared_from_this(), placeholders::error));
 		}
 		else
 		{
@@ -62,7 +62,7 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 			wsFinalPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
 			wsFinalPath += L":";
 			wsFinalPath += std::to_wstring(config->hook->serverPort);
-			wsFinalPath += L"/fesl/";
+			wsFinalPath += L"/plasma/";
 			wsFinalPath += (hook->exeType == CLIENT) ? L"client" : L"server";
 
 			BOOST_LOG_TRIVIAL(info) << "Connecting to " << wsFinalPath << "...";
@@ -91,7 +91,7 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 							incoming_data.close();
 
 							async_write(game_socket_, buffer(send_data, send_length),
-								boost::bind(&ConnectionFESL::handle_write, shared_from_this(), placeholders::error));
+								boost::bind(&ConnectionPlasma::handle_write, shared_from_this(), placeholders::error));
 							break;
 						}
 						case websocket_message_type::ping:
@@ -136,7 +136,7 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 		}
 
 		connected_to_game = true;
-		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionFESL::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionPlasma::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 		BOOST_LOG_TRIVIAL(info) << "Client connected";
 	}
 	else
@@ -146,7 +146,7 @@ void ConnectionFESL::handle_handshake(const boost::system::error_code& error)
 	}
 }
 
-void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
+void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
 	BOOST_LOG_NAMED_SCOPE("handle_read")
 
@@ -177,7 +177,7 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 			if (connected_to_retail)
 			{
 				async_write(retail_socket_, buffer(received_data, received_length),
-					boost::bind(&ConnectionFESL::retail_handle_write, shared_from_this(), placeholders::error));
+					boost::bind(&ConnectionPlasma::retail_handle_write, shared_from_this(), placeholders::error));
 			}
 		}
 		else
@@ -204,7 +204,7 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 			}
 		}
 
-		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionFESL::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), boost::bind(&ConnectionPlasma::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 	}
 	else
 	{
@@ -213,7 +213,7 @@ void ConnectionFESL::handle_read(const boost::system::error_code& error, size_t 
 	}
 }
 
-void ConnectionFESL::handle_write(const boost::system::error_code& error)
+void ConnectionPlasma::handle_write(const boost::system::error_code& error)
 {
 	BOOST_LOG_NAMED_SCOPE("handle_write")
 
@@ -244,7 +244,7 @@ void ConnectionFESL::handle_write(const boost::system::error_code& error)
 	}
 }
 
-void ConnectionFESL::retail_handle_connect(const boost::system::error_code& error)
+void ConnectionPlasma::retail_handle_connect(const boost::system::error_code& error)
 {
 	BOOST_LOG_NAMED_SCOPE("retail_handle_connect")
 
@@ -252,7 +252,7 @@ void ConnectionFESL::retail_handle_connect(const boost::system::error_code& erro
 	{
 		BOOST_LOG_TRIVIAL(info) << "Connected to retail server!";
 
-		retail_socket_.async_handshake(ssl::stream_base::client, boost::bind(&ConnectionFESL::retail_handle_handshake, shared_from_this(), placeholders::error));
+		retail_socket_.async_handshake(ssl::stream_base::client, boost::bind(&ConnectionPlasma::retail_handle_handshake, shared_from_this(), placeholders::error));
 	}
 	else
 	{
@@ -261,7 +261,7 @@ void ConnectionFESL::retail_handle_connect(const boost::system::error_code& erro
 	}
 }
 
-void ConnectionFESL::retail_handle_handshake(const boost::system::error_code& error)
+void ConnectionPlasma::retail_handle_handshake(const boost::system::error_code& error)
 {
 	BOOST_LOG_NAMED_SCOPE("retail_handle_handshake")
 
@@ -271,9 +271,9 @@ void ConnectionFESL::retail_handle_handshake(const boost::system::error_code& er
 
 		connected_to_retail = true;
 		async_write(retail_socket_, buffer(received_data, received_length),
-			boost::bind(&ConnectionFESL::retail_handle_write, shared_from_this(), placeholders::error));
+			boost::bind(&ConnectionPlasma::retail_handle_write, shared_from_this(), placeholders::error));
 
-		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionFESL::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionPlasma::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 	}
 	else
 	{
@@ -282,7 +282,7 @@ void ConnectionFESL::retail_handle_handshake(const boost::system::error_code& er
 	}
 }
 
-void ConnectionFESL::retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred)
+void ConnectionPlasma::retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
 	BOOST_LOG_NAMED_SCOPE("retail_handle_read")
 
@@ -293,16 +293,16 @@ void ConnectionFESL::retail_handle_read(const boost::system::error_code& error, 
 		if (send_data[(send_length + receivedDataOffset) - 1] != NULL)
 		{
 			receivedDataOffset += send_length;
-			retail_socket_.async_read_some(buffer(send_data + receivedDataOffset, PACKET_MAX_LENGTH - receivedDataOffset), bind(&ConnectionFESL::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+			retail_socket_.async_read_some(buffer(send_data + receivedDataOffset, PACKET_MAX_LENGTH - receivedDataOffset), bind(&ConnectionPlasma::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 			return;
 		}
 
 		async_write(game_socket_,
 			buffer(send_data, send_length + receivedDataOffset),
-			boost::bind(&ConnectionFESL::handle_write, shared_from_this(), placeholders::error));
+			boost::bind(&ConnectionPlasma::handle_write, shared_from_this(), placeholders::error));
 
 		receivedDataOffset = NULL;
-		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionFESL::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionPlasma::retail_handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
 	}
 	else
 	{
@@ -311,7 +311,7 @@ void ConnectionFESL::retail_handle_read(const boost::system::error_code& error, 
 	}
 }
 
-void ConnectionFESL::retail_handle_write(const boost::system::error_code& error)
+void ConnectionPlasma::retail_handle_write(const boost::system::error_code& error)
 {
 	BOOST_LOG_NAMED_SCOPE("retail_handle_write")
 
@@ -323,7 +323,7 @@ void ConnectionFESL::retail_handle_write(const boost::system::error_code& error)
 }
 
 
-void ConnectionFESL::handle_stop()
+void ConnectionPlasma::handle_stop()
 {
 	BOOST_LOG_NAMED_SCOPE("handle_stop")
 

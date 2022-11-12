@@ -1,5 +1,5 @@
-﻿#pragma once
-#include "ConnectionFESL.hpp"
+#pragma once
+#include "ConnectionPlasma.hpp"
 
 class ProxyTCP : boost::asio::noncopyable
 {
@@ -15,6 +15,7 @@ private:
 
 	void start_accept();
 	ConnectionFESL::pointer new_fesl_connection;
+	ConnectionPlasma::pointer new_plasma_connection;
 
-	void handle_accept_fesl(const boost::system::error_code& error);
+	void handle_accept_plasma(const boost::system::error_code& error);
 };

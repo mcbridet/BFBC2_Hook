@@ -2,11 +2,11 @@
 
 typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socketSSL;
 
-class ConnectionFESL : public boost::enable_shared_from_this<ConnectionFESL>, boost::asio::noncopyable
+class ConnectionPlasma : public boost::enable_shared_from_this<ConnectionPlasma>, boost::asio::noncopyable
 {
 public:
-	ConnectionFESL(boost::asio::io_service& io_service, boost::asio::ssl::context& context);
-	typedef boost::shared_ptr<ConnectionFESL> pointer;
+	ConnectionPlasma(boost::asio::io_service& io_service, boost::asio::ssl::context& context);
+	typedef boost::shared_ptr<ConnectionPlasma> pointer;
 
 	socketSSL::lowest_layer_type& gameSocket();
 	socketSSL::lowest_layer_type& retailSocket();

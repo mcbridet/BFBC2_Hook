@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class ProxyClient
 {
@@ -15,5 +15,5 @@ public:
         return *_instance;
     }
 
-    boost::asio::ip::tcp::resolver* feslResolver;
+    boost::asio::ip::tcp::resolver* plasmaResolver;
 };

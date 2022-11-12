@@ -1,4 +1,4 @@
-﻿#include "pch.hpp"
+#include "pch.hpp"
 #include "Proxy.hpp"
 
 #include "Hook.hpp"
@@ -25,29 +25,29 @@ Proxy::Proxy()
 		{
 			io_service io_service;
 
-			USHORT feslPort;
+			USHORT plasmaPort;
 			USHORT theaterPort;
 
 			if (hook->exeType == CLIENT)
 			{
-				feslPort = CLIENT_FESL_PORT;
+				plasmaPort = CLIENT_PLASMA_PORT;
 				theaterPort = CLIENT_THEATER_PORT;
 			}
 			else if (hook->exeType == SERVER)
 			{
-				feslPort = SERVER_FESL_PORT;
+				plasmaPort = SERVER_PLASMA_PORT;
 				theaterPort = SERVER_THEATER_PORT;
 			}
 			else
 				return;
 
 			BOOST_LOG_TRIVIAL(info) << "Initializing...";
-			ProxyTCP* feslProxy = new ProxyTCP(io_service, feslPort, true);
+			ProxyTCP* plasmaProxy = new ProxyTCP(io_service, plasmaPort, true);
 
 			if (config->hook->connectRetail)
 			{
 				ProxyClient* proxyClient = &ProxyClient::getInstance();
-				proxyClient->feslResolver = new ip::tcp::resolver(io_service);
+				proxyClient->plasmaResolver = new ip::tcp::resolver(io_service);
 			}
 
 			BOOST_LOG_TRIVIAL(info) << "Finished initialization, ready for receiving incoming connections!";

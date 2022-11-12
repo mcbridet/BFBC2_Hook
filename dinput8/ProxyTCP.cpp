@@ -1,4 +1,4 @@
-﻿#include "pch.hpp"
+#include "pch.hpp"
 #include "ProxyTCP.hpp"
 
 using namespace boost;
@@ -30,13 +30,28 @@ void ProxyTCP::start_accept()
 {
 	if (secure_)
 	{
-		new_fesl_connection.reset(new ConnectionFESL((io_context&)acceptor_.get_executor().context(), context_));
-		acceptor_.async_accept(new_fesl_connection->gameSocket(), bind(&ProxyTCP::handle_accept_fesl, this, asio::placeholders::error));
+		new_plasma_connection.reset(new ConnectionPlasma((io_context&)acceptor_.get_executor().context(), context_));
+		acceptor_.async_accept(new_plasma_connection->gameSocket(), bind(&ProxyTCP::handle_accept_plasma, this, asio::placeholders::error));
 	}
 	else
 	{
 
+void ProxyTCP::handle_accept_plasma(const system::error_code& error)
+{
+	BOOST_LOG_NAMED_SCOPE("Plasma")
+
+	if (!acceptor_.is_open())
+	{
+		BOOST_LOG_TRIVIAL(error) << "TCP Socket, port " << port_ << " - acceptor is not open";
+		return;
 	}
+
+	if (!error)
+		new_plasma_connection->start();
+	else
+		BOOST_LOG_TRIVIAL(error) << "TCP Socket, port " << port_ << " - error: " << error.message() << ", error code: " << error.value();
+
+	start_accept();
 }
 
 void ProxyTCP::handle_accept_fesl(const system::error_code& error)
