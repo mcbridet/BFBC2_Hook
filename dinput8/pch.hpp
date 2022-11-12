@@ -31,6 +31,8 @@
 #include <boost/foreach.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/http.hpp>
 
 // Detours
 #include <detours.h>
@@ -46,6 +48,7 @@
 
 // Cpprestsdk
 #include <cpprest/ws_client.h>
+#include <cpprest/http_client.h>
 #pragma comment(lib, "cpprest143_2_10.lib")
 
 #endif //PCH_H
