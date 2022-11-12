@@ -152,7 +152,8 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
-    <ClInclude Include="ConnectionFESL.hpp" />
+    <ClInclude Include="ConnectionTheater.hpp" />
+    <ClInclude Include="ConnectionPlasma.hpp" />
     <ClInclude Include="dinput8.hpp" />
     <ClInclude Include="ExecutableType.hpp" />
     <ClInclude Include="ExitCode.hpp" />
@@ -165,11 +166,13 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
     <ClInclude Include="ProxyCert.hpp" />
     <ClInclude Include="ProxyClient.hpp" />
     <ClInclude Include="ProxyTCP.hpp" />
+    <ClInclude Include="ProxyUDP.hpp" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="ConnectionFESL.cpp" />
+    <ClCompile Include="ConnectionTheater.cpp" />
+    <ClCompile Include="ConnectionPlasma.cpp" />
     <ClCompile Include="dinput8.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Hook.cpp" />
@@ -184,6 +187,7 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
     <ClCompile Include="Proxy.cpp" />
     <ClCompile Include="ProxyClient.cpp" />
     <ClCompile Include="ProxyTCP.cpp" />
+    <ClCompile Include="ProxyUDP.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

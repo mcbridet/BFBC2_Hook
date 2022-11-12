@@ -1,4 +1,4 @@
-#include "pch.hpp"
+﻿#include "pch.hpp"
 #include "ProxyTCP.hpp"
 
 using namespace boost;
@@ -35,6 +35,10 @@ void ProxyTCP::start_accept()
 	}
 	else
 	{
+		new_theater_connection.reset(new ConnectionTheater((io_context&)acceptor_.get_executor().context()));
+		acceptor_.async_accept(new_theater_connection->gameSocket(), boost::bind(&ProxyTCP::handle_accept_theater, this, asio::placeholders::error));
+	}
+}
 
 void ProxyTCP::handle_accept_plasma(const system::error_code& error)
 {
@@ -54,18 +58,18 @@ void ProxyTCP::handle_accept_plasma(const system::error_code& error)
 	start_accept();
 }
 
-void ProxyTCP::handle_accept_fesl(const system::error_code& error)
+void ProxyTCP::handle_accept_theater(const system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("FESL")
+	BOOST_LOG_NAMED_SCOPE("Theater")
 
-	if (!acceptor_.is_open())
-	{
-		BOOST_LOG_TRIVIAL(error) << "TCP Socket, port " << port_ << " - acceptor is not open";
-		return;
-	}
+		if (!acceptor_.is_open())
+		{
+			BOOST_LOG_TRIVIAL(error) << "TCP Socket, port " << port_ << " - acceptor is not open";
+			return;
+		}
 
 	if (!error)
-		new_fesl_connection->start();
+		new_theater_connection->start();
 	else
 		BOOST_LOG_TRIVIAL(error) << "TCP Socket, port " << port_ << " - error: " << error.message() << ", error code: " << error.value();
 

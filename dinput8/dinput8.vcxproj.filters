@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -84,6 +84,12 @@
     <ClInclude Include="ProxyClient.hpp">
       <Filter>Header Files\proxy</Filter>
     </ClInclude>
+    <ClInclude Include="ProxyUDP.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionTheater.hpp">
+      <Filter>Header Files\proxy\connection</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -121,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="ProxyClient.cpp">
       <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyUDP.cpp">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionTheater.cpp">
+      <Filter>Source Files\proxy\connection</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

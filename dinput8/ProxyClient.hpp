@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+#include "ProxyUDP.hpp"
 
 class ProxyClient
 {
@@ -16,4 +17,8 @@ public:
     }
 
     boost::asio::ip::tcp::resolver* plasmaResolver;
+
+    ProxyUDP* theaterCtx;
+    web::websockets::client::websocket_callback_client theater_ws;
+    bool connected_to_theater = false;
 };

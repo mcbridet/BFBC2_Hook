@@ -1,9 +1,10 @@
-#include "pch.hpp"
+﻿#include "pch.hpp"
 #include "Proxy.hpp"
 
 #include "Hook.hpp"
 #include "ProxyClient.hpp"
 #include "ProxyTCP.hpp"
+#include "ProxyUDP.hpp"
 
 DWORD WINAPI ProxyInit(LPVOID /*lpParameter*/)
 {
@@ -43,6 +44,9 @@ Proxy::Proxy()
 
 			BOOST_LOG_TRIVIAL(info) << "Initializing...";
 			ProxyTCP* plasmaProxy = new ProxyTCP(io_service, plasmaPort, true);
+
+			ProxyTCP* theaterProxyTCP = new ProxyTCP(io_service, theaterPort, false);
+			ProxyUDP* theaterProxyUDP = new ProxyUDP(io_service, theaterPort);
 
 			if (config->hook->connectRetail)
 			{
