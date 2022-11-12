@@ -48,7 +48,7 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 		memcpy(packet_data_raw, received_data + 12, packet_length - 12);
 		std::string packet_data = Utils::GetPacketData(packet_data_raw);
 
-		BOOST_LOG_TRIVIAL(debug) << boost::format("-> %s %08x%08x {%s} [UDP]") % packet_category % packet_type % packet_length % packet_data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] -> %s %08x%08x {%s}") % packet_category % packet_type % packet_length % packet_data;
 
 		ProxyClient* pClient = &ProxyClient::getInstance();
 		pClient->theaterCtx = this;
