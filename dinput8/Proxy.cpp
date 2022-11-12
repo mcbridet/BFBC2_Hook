@@ -5,6 +5,7 @@
 #include "ProxyClient.hpp"
 #include "ProxyTCP.hpp"
 #include "ProxyUDP.hpp"
+#include "ProxyHTTP.hpp"
 
 DWORD WINAPI ProxyInit(LPVOID /*lpParameter*/)
 {
@@ -47,6 +48,8 @@ Proxy::Proxy()
 
 			ProxyTCP* theaterProxyTCP = new ProxyTCP(io_service, theaterPort, false);
 			ProxyUDP* theaterProxyUDP = new ProxyUDP(io_service, theaterPort);
+
+			ProxyHTTP* httpProxy = new ProxyHTTP(io_service, HTTP_PORT);
 
 			if (config->hook->connectRetail)
 			{
