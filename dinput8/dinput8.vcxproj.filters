@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -36,6 +36,12 @@
     </Filter>
     <Filter Include="Source Files\proxy\connection">
       <UniqueIdentifier>{e59f51c4-8670-4f66-acd4-4c2a918e83a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\proxy\http">
+      <UniqueIdentifier>{b737e678-4e4b-4b58-9600-982281aacbbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\proxy\http">
+      <UniqueIdentifier>{f1d0bf60-4c5c-48ec-adfb-024f3975697a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +96,9 @@
     <ClInclude Include="ConnectionTheater.hpp">
       <Filter>Header Files\proxy\connection</Filter>
     </ClInclude>
+    <ClInclude Include="HttpHandler.hpp">
+      <Filter>Header Files\proxy\http</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -133,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="ConnectionTheater.cpp">
       <Filter>Source Files\proxy\connection</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpHandler.cpp">
+      <Filter>Source Files\proxy\http</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
