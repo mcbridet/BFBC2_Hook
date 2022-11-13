@@ -1,4 +1,4 @@
-﻿#include "pch.hpp"
+#include "pch.hpp"
 #include "Config.hpp"
 
 Config::Config()
@@ -49,8 +49,8 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	is << timeLocal;
 
 	hook->logPath = pt.get("debug.logPath", (boost::format("bfbc2_%1%.log") % is.str()).str());
-	hook->consoleLogLevel = pt.get("debug.logLevelConsole", boost::log::trivial::info);
-	hook->fileLogLevel = pt.get("debug.logLevelFile", boost::log::trivial::debug);
+	hook->consoleLogLevel = pt.get("debug.logLevelConsole", (int)boost::log::trivial::info);
+	hook->fileLogLevel = pt.get("debug.logLevelFile", (int)boost::log::trivial::debug);
 
 	// Section - Patches
 	hook->verifyGameVersion = pt.get("patches.verifyGameVersion", true);

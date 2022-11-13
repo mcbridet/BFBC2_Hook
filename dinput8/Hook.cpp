@@ -57,8 +57,8 @@ void Hook::InitLogging()
 
 	bool enableConsole = config->hook->showConsole;
 	bool enableLogFile = config->hook->createLog;
-	bool consoleLogLevel = config->hook->consoleLogLevel;
-	bool fileLogLevel = config->hook->fileLogLevel;
+	int consoleLogLevel = config->hook->consoleLogLevel;
+	int fileLogLevel = config->hook->fileLogLevel;
 
 	logging::add_common_attributes();
 	logging::core::get()->add_global_attribute("Scope", boost::log::attributes::named_scope());
