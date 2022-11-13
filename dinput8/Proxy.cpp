@@ -1,4 +1,4 @@
-﻿#include "pch.hpp"
+#include "pch.hpp"
 #include "Proxy.hpp"
 
 #include "Hook.hpp"
@@ -23,6 +23,8 @@ Proxy::Proxy()
 
 	while (true)
 	{
+		ProxyClient* proxyClient = &ProxyClient::getInstance();
+
 		try
 		{
 			io_service io_service;
@@ -53,13 +55,25 @@ Proxy::Proxy()
 
 			if (config->hook->connectRetail)
 			{
-				ProxyClient* proxyClient = &ProxyClient::getInstance();
 				proxyClient->plasmaResolver = new ip::tcp::resolver(io_service);
 			}
 
 			BOOST_LOG_TRIVIAL(info) << "Finished initialization, ready for receiving incoming connections!";
 
 			io_service.run();
+		}
+		catch (ProxyStopException& e)
+		{
+			// Either retail or websocket were disconnected, clean up memory by restarting proxy
+			BOOST_LOG_TRIVIAL(info) << "Restarting proxy...";
+
+			if (proxyClient->connected_to_theater)
+			{
+				proxyClient->connected_to_theater = false;
+				proxyClient->theater_ws.close();
+			}
+
+			continue;
 		}
 		catch (std::exception& e)
 		{
