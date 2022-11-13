@@ -1,4 +1,4 @@
-﻿#include "pch.hpp"
+#include "pch.hpp"
 #include "ConnectionPlasma.hpp"
 
 #include "Config.hpp"
@@ -33,7 +33,7 @@ void ConnectionPlasma::start()
 
 void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_handshake")
+	BOOST_LOG_NAMED_SCOPE("Plasma->handle_handshake")
 
 	Config* config = &Config::getInstance();
 	Hook* hook = &Hook::getInstance();
@@ -148,7 +148,7 @@ void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 
 void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_read")
+	BOOST_LOG_NAMED_SCOPE("Plasma->handle_read")
 
 	Config* config = &Config::getInstance();
 
@@ -215,7 +215,7 @@ void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_
 
 void ConnectionPlasma::handle_write(const boost::system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_write")
+	BOOST_LOG_NAMED_SCOPE("Plasma->handle_write")
 
 	if (!error)
 	{
@@ -246,7 +246,7 @@ void ConnectionPlasma::handle_write(const boost::system::error_code& error)
 
 void ConnectionPlasma::retail_handle_connect(const boost::system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("retail_handle_connect")
+	BOOST_LOG_NAMED_SCOPE("Plasma->retail_handle_connect")
 
 	if (!error)
 	{
@@ -263,7 +263,7 @@ void ConnectionPlasma::retail_handle_connect(const boost::system::error_code& er
 
 void ConnectionPlasma::retail_handle_handshake(const boost::system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("retail_handle_handshake")
+	BOOST_LOG_NAMED_SCOPE("Plasma->retail_handle_handshake")
 
 	if (!error)
 	{
@@ -284,7 +284,7 @@ void ConnectionPlasma::retail_handle_handshake(const boost::system::error_code& 
 
 void ConnectionPlasma::retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
-	BOOST_LOG_NAMED_SCOPE("retail_handle_read")
+	BOOST_LOG_NAMED_SCOPE("Plasma->retail_handle_read")
 
 	if (!error)
 	{
@@ -313,7 +313,7 @@ void ConnectionPlasma::retail_handle_read(const boost::system::error_code& error
 
 void ConnectionPlasma::retail_handle_write(const boost::system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("retail_handle_write")
+	BOOST_LOG_NAMED_SCOPE("Plasma->retail_handle_write")
 
 	if (error)
 	{
@@ -325,7 +325,7 @@ void ConnectionPlasma::retail_handle_write(const boost::system::error_code& erro
 
 void ConnectionPlasma::handle_stop()
 {
-	BOOST_LOG_NAMED_SCOPE("handle_stop")
+	BOOST_LOG_NAMED_SCOPE("Plasma->handle_stop")
 
 	if (connected_to_retail)
 	{
