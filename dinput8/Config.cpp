@@ -1,4 +1,4 @@
-#include "pch.hpp"
+﻿#include "pch.hpp"
 #include "Config.hpp"
 
 Config::Config()
@@ -24,7 +24,8 @@ void Config::readConfig() const
 
 		if (boost::filesystem::exists(configPath)) {
 			// Print parse error only if it's actual parse error
-			std::wstring errMessage = std::wstring(e.message().begin(), e.message().end());
+			std::string temp = std::string(e.what());
+			std::wstring errMessage = std::wstring(temp.begin(), temp.end());
 			std::wstring message = L"Hook will use default configs because error occured while parsing config file: ";
 			message += errMessage;
 
