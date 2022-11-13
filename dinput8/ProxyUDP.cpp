@@ -30,7 +30,7 @@ void ProxyUDP::start_receive()
 
 void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_transferred)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_receive");
+	BOOST_LOG_NAMED_SCOPE("TheaterUDP->handle_receive");
 
 	if (!error && bytes_transferred > 0)
 	{
