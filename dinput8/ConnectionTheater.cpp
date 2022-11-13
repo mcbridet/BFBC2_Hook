@@ -26,7 +26,6 @@ tcp::socket& ConnectionTheater::retailSocket()
 	return retail_socket_;
 }
 
-
 void ConnectionTheater::start()
 {
 	game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
@@ -34,7 +33,7 @@ void ConnectionTheater::start()
 
 void ConnectionTheater::handle_read(const system::error_code& error, size_t bytes_transferred)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_read")
+	BOOST_LOG_NAMED_SCOPE("Theater->handle_read")
 
 	if (!error)
 	{
@@ -161,7 +160,7 @@ void ConnectionTheater::handle_read(const system::error_code& error, size_t byte
 
 void ConnectionTheater::handle_write(const boost::system::error_code& error)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_write")
+	BOOST_LOG_NAMED_SCOPE("Theater->handle_write")
 
 	if (!error)
 	{
@@ -190,9 +189,9 @@ void ConnectionTheater::handle_write(const boost::system::error_code& error)
 	}
 }
 
-void ConnectionTheater::handle_stop()
+void ConnectionTheater::handle_stop(bool crash)
 {
-	BOOST_LOG_NAMED_SCOPE("handle_stop")
+	BOOST_LOG_NAMED_SCOPE("Theater->handle_stop")
 
 	if (connected_to_retail)
 	{
