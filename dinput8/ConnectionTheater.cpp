@@ -56,102 +56,137 @@ void ConnectionTheater::handle_read(const system::error_code& error, size_t byte
 		BOOST_LOG_TRIVIAL(debug) << boost::format("-> %s %08x%08x {%s}") % packet_category % packet_type % packet_length % packet_data;
 		ProxyClient* pClient = &ProxyClient::getInstance();
 
+		Config* config = &Config::getInstance();
+		Hook* hook = &Hook::getInstance();
+
 		if (!pClient->connected_to_theater)
 		{
-			Config* config = &Config::getInstance();
-			Hook* hook = &Hook::getInstance();
+			if (config->hook->connectRetail)
+			{
+				ProxyClient* proxyClient = &ProxyClient::getInstance();
 
-			std::wstring wsFinalPath = config->hook->serverSecure ? L"wss://" : L"ws://";
-			wsFinalPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
-			wsFinalPath += L":";
-			wsFinalPath += std::to_wstring(config->hook->serverPort);
-			wsFinalPath += L"/theater/";
-			wsFinalPath += (hook->exeType == CLIENT) ? L"client" : L"server";
+				std::string host = hook->exeType == CLIENT ? "bfbc2-pc.theater.ea.com" : "bfbc2-pc-server.theater.ea.com";
+				std::string port = std::to_string(hook->exeType == CLIENT ? CLIENT_THEATER_PORT : SERVER_THEATER_PORT);
 
-			BOOST_LOG_TRIVIAL(info) << "Connecting to " << wsFinalPath << "...";
+				BOOST_LOG_TRIVIAL(warning) << "Connecting to retail server (" << host << ":" << port << ")...";
 
-			ws.set_message_handler([this, pClient](websocket_incoming_message msg) {
-				try {
-					switch (msg.message_type())
-					{
-						case websocket_message_type::binary_message:
+				tcp::resolver::query query(host, port);
+				tcp::resolver::iterator iterator = proxyClient->plasmaResolver->resolve(query);
+
+				async_connect(retailSocket(), iterator, bind(&ConnectionTheater::retail_handle_connect, shared_from_this(), asio::placeholders::error));
+			}
+			else
+			{
+				std::wstring wsFinalPath = config->hook->serverSecure ? L"wss://" : L"ws://";
+				wsFinalPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
+				wsFinalPath += L":";
+				wsFinalPath += std::to_wstring(config->hook->serverPort);
+				wsFinalPath += L"/theater/";
+				wsFinalPath += (hook->exeType == CLIENT) ? L"client" : L"server";
+
+				BOOST_LOG_TRIVIAL(info) << "Connecting to " << wsFinalPath << "...";
+
+				ws.set_message_handler([this, pClient](websocket_incoming_message msg) {
+					try {
+						switch (msg.message_type())
 						{
-							auto incoming_data_raw = msg.body();
-							concurrency::streams::container_buffer<std::vector<uint8_t>> incoming_data;
-							incoming_data_raw.read_to_end(incoming_data).wait();
-
-							std::vector<uint8_t> read_data = incoming_data.collection();
-							std::fill_n(send_data, PACKET_MAX_LENGTH, 0);
-							memcpy(send_data, read_data.data(), read_data.size());
-
-							send_length = read_data.size();
-							incoming_data.close();
-
-							char packet_category[HEADER_LENGTH + 1];
-							memcpy(packet_category, send_data, HEADER_LENGTH);
-							packet_category[HEADER_LENGTH] = '\0';
-
-							if (packet_category == "ECHO")
+							case websocket_message_type::binary_message:
 							{
-								pClient->theaterCtx->socket_.async_send_to(
-									buffer(send_data, send_length),
-									pClient->theaterCtx->remote_endpoint_,
-									boost::bind(&ProxyUDP::handle_send, pClient->theaterCtx, asio::placeholders::error, asio::placeholders::bytes_transferred)
-								);
-							}
-							else
-							{
-								async_write(game_socket_, buffer(send_data, send_length), bind(&ConnectionTheater::handle_write, shared_from_this(), asio::placeholders::error));
-							}
+								auto incoming_data_raw = msg.body();
+								concurrency::streams::container_buffer<std::vector<uint8_t>> incoming_data;
+								incoming_data_raw.read_to_end(incoming_data).wait();
 
-							break;
+								std::vector<uint8_t> read_data = incoming_data.collection();
+								std::fill_n(send_data, PACKET_MAX_LENGTH, 0);
+								memcpy(send_data, read_data.data(), read_data.size());
+
+								send_length = read_data.size();
+								incoming_data.close();
+
+								char packet_category[HEADER_LENGTH + 1];
+								memcpy(packet_category, send_data, HEADER_LENGTH);
+								packet_category[HEADER_LENGTH] = '\0';
+
+								if (std::string(packet_category) == "ECHO")
+								{
+									std::fill_n(pClient->udp_send_data, PACKET_MAX_LENGTH, 0);
+									memcpy(pClient->udp_send_data, send_data, send_length);
+
+									pClient->theaterCtx->socket_.async_send_to(
+										buffer(send_data, send_length),
+										pClient->theaterCtx->remote_endpoint_,
+										boost::bind(&ProxyUDP::handle_send, pClient->theaterCtx, asio::placeholders::error, asio::placeholders::bytes_transferred)
+									);
+								}
+								else
+								{
+									if (connected_to_game)
+									{
+										async_write(game_socket_, buffer(send_data, send_length), bind(&ConnectionTheater::handle_write, shared_from_this(), asio::placeholders::error));
+									}
+								}
+
+								break;
+							}
 						}
 					}
+					catch (const websocket_exception& ex)
+					{
+						BOOST_LOG_TRIVIAL(error) << "[WebSocket Message Handler]: Failed to read from websocket! (" << ex.what() << ")";
+					}
+				});
+
+				ws.set_close_handler([this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error) {
+					BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << (int)close_status << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
+					handle_stop(false);
+				});
+
+				try
+				{
+					ws.connect(wsFinalPath).wait();
+
+					connected_to_game = true;
+					pClient->connected_to_theater = true;
+					pClient->theater_ws = ws;
 				}
 				catch (const websocket_exception& ex)
 				{
-					BOOST_LOG_TRIVIAL(error) << "[WebSocket Message Handler]: Failed to read from websocket! (" << ex.what() << ")";
+					BOOST_LOG_TRIVIAL(error) << "Failed to connect to server! (" << ex.what() << ")";
+					return;
 				}
-			});
+			}
+		}
 
-			ws.set_close_handler([this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error) {
-				BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << (int)close_status << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
-				handle_stop();
-			});
-
+		if (config->hook->connectRetail)
+		{
+			if (connected_to_retail)
+			{
+				async_write(retail_socket_, buffer(received_data, received_length),
+					boost::bind(&ConnectionTheater::retail_handle_write, shared_from_this(), asio::placeholders::error));
+			}
+		}
+		else
+		{
 			try
 			{
-				ws.connect(wsFinalPath).wait();
+				auto packet_data = new char[received_length];
+				memcpy(packet_data, received_data, received_length);
 
-				pClient->connected_to_theater = true;
-				pClient->theater_ws = ws;
+				std::string msgcontent = std::string(packet_data, received_length);
+				std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
+
+				auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
+
+				websocket_outgoing_message msg;
+				msg.set_binary_message(is);
+
+				ws.send(msg);
 			}
 			catch (const websocket_exception& ex)
 			{
-				BOOST_LOG_TRIVIAL(error) << "Failed to connect to server! (" << ex.what() << ")";
-				return;
+				BOOST_LOG_TRIVIAL(error) << "handle_read() - Failed to write to websocket! (" << ex.what() << ")";
+				return handle_stop();
 			}
-		}
-
-		try
-		{
-			auto packet_data = new char[received_length];
-			memcpy(packet_data, received_data, received_length);
-
-			std::string msgcontent = std::string(packet_data, received_length);
-			std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
-
-			auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
-
-			websocket_outgoing_message msg;
-			msg.set_binary_message(is);
-
-			ws.send(msg);
-		}
-		catch (const websocket_exception& ex)
-		{
-			BOOST_LOG_TRIVIAL(error) << "handle_read() - Failed to write to websocket! (" << ex.what() << ")";
-			return handle_stop();
 		}
 
 		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
@@ -214,4 +249,68 @@ void ConnectionTheater::handle_stop(bool crash)
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "Client Disconnected!";
+
+	if (crash)
+	{
+		// Throw an exception to restart proxy
+		throw ProxyStopException();
+	}
+}
+
+void ConnectionTheater::retail_handle_connect(const boost::system::error_code& error)
+{
+	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_connect")
+
+	if (!error)
+	{
+		BOOST_LOG_TRIVIAL(info) << "Connected to retail server!";
+
+		connected_to_retail = true;
+		async_write(retail_socket_, buffer(received_data, received_length), boost::bind(&ConnectionTheater::retail_handle_write, shared_from_this(), asio::placeholders::error));
+
+		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+	}
+	else
+	{
+		BOOST_LOG_TRIVIAL(error) << "Connection to retail server failed! (" << error.message() << ")";
+		handle_stop();
+	}
+}
+
+void ConnectionTheater::retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred)
+{
+	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_read")
+
+	if (!error)
+	{
+		send_length = bytes_transferred;
+
+		if (send_data[(send_length + receivedDataOffset) - 1] != NULL)
+		{
+			receivedDataOffset += send_length;
+			retail_socket_.async_read_some(buffer(send_data + receivedDataOffset, PACKET_MAX_LENGTH - receivedDataOffset), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+			return;
+		}
+
+		async_write(game_socket_, buffer(send_data, send_length + receivedDataOffset), boost::bind(&ConnectionTheater::handle_write, shared_from_this(), asio::placeholders::error));
+
+		receivedDataOffset = NULL;
+		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+	}
+	else
+	{
+		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
+		handle_stop();
+	}
+}
+
+void ConnectionTheater::retail_handle_write(const boost::system::error_code& error)
+{
+	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_write")
+
+	if (error)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
+		handle_stop();
+	}
 }

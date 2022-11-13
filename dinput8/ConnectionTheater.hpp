@@ -24,11 +24,17 @@ private:
 	unsigned char send_data[PACKET_MAX_LENGTH];
 	unsigned int send_length;
 
+	int receivedDataOffset = 0;
+
 	bool connected_to_game = false;
 	bool connected_to_retail = false;
 
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred);	// normal read (also deals with multiple packets)
 	void handle_write(const boost::system::error_code& error);							// normal send (also deals with multiple packets)
-	void handle_stop();																	// cleanup after a disconnect
+	void handle_stop(bool crash = true);												// cleanup after a disconnect
+
+	void retail_handle_connect(const boost::system::error_code& error);
+	void retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred);
+	void retail_handle_write(const boost::system::error_code& error);
 };
 
