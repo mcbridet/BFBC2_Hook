@@ -24,3 +24,4 @@
 #include "Utils.hpp"
 #include "ProxyCert.hpp"
 #include "ExecutableType.hpp"
+#include "ProxyStopException.hpp"
