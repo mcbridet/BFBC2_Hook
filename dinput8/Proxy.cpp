@@ -62,7 +62,7 @@ Proxy::Proxy()
 
 			io_service.run();
 		}
-		catch (ProxyStopException& e)
+		catch (ProxyStopException&)
 		{
 			// Either retail or websocket were disconnected, clean up memory by restarting proxy
 			BOOST_LOG_TRIVIAL(info) << "Restarting proxy...";
