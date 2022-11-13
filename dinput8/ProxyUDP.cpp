@@ -80,9 +80,30 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 }
 
 
-void ProxyUDP::handle_send(const system::error_code& /*error*/, size_t /*bytes_transferred*/)
+void ProxyUDP::handle_send(const system::error_code& error, size_t bytes_transferred)
 {
-	// Done sending, do we need to do something more here? (normally we don't specifically wait for incoming udp packets)
+	BOOST_LOG_NAMED_SCOPE("TheaterUDP->handle_send");
+
+	if (!error)
+	{
+		// Only for logging
+		ProxyClient* pClient = &ProxyClient::getInstance();
+
+		// Packet category (fsys, acct, etc...)
+		char packet_category[HEADER_LENGTH + 1];
+		memcpy(packet_category, pClient->udp_send_data, HEADER_LENGTH);
+		packet_category[HEADER_LENGTH] = '\0';
+
+		// Packet type (NORMAL, SPLITTED, etc...)
+		const unsigned int packet_type = Utils::DecodeInt(pClient->udp_send_data + 4, 4);
+		const unsigned int packet_length = Utils::DecodeInt(pClient->udp_send_data + 8, 4);
+
+		const auto packet_data_raw = new char[packet_length - 12];
+		memcpy(packet_data_raw, pClient->udp_send_data + 12, packet_length - 12);
+		std::string packet_data = Utils::GetPacketData(packet_data_raw);
+
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] <- %s %08x%08x {%s}") % packet_category % packet_type % packet_length % packet_data;
+	}
 }
 
 void ProxyUDP::handle_stop()
