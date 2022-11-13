@@ -110,3 +110,15 @@ jobs:
         with:
           name: ReleaseBuild
           path: Release
+      
+      - name: Compress Release
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          Compress-Archive -Path .\Release\*.dll -DestinationPath BFBC2_Hook_Release.zip
+
+      - name: Upload Release
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: BFBC2_Hook_Release.zip
+      
