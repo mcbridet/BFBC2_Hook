@@ -31,7 +31,7 @@ void HttpHandler::start()
 
 void HttpHandler::process_request(const system::error_code& error, size_t bytes_transferred)
 {
-	BOOST_LOG_NAMED_SCOPE("process_request")
+	BOOST_LOG_NAMED_SCOPE("HTTP->process_request")
 
 	if (!error)
 	{
@@ -57,6 +57,7 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		}
 
 		auto target = request_header.target();
+		logTarget = target.to_string();
 
 		if (host.starts_with("easo.ea.com"))
 		{
@@ -113,5 +114,5 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 
 void HttpHandler::handle_write(const system::error_code& error, size_t bytes_transferred)
 {
-
+	BOOST_LOG_TRIVIAL(debug) << boost::format("%s %s [%s]") % request_.method_string() % logTarget % response_.result_int();
 }

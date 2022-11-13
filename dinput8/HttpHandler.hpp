@@ -25,6 +25,8 @@ private:
 	// The response message.
 	boost::beast::http::response <boost::beast::http::dynamic_body> response_;
 
+	std::string logTarget;
+
 	void process_request(const boost::system::error_code& error, size_t bytes_transferred);
 	void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
 };
