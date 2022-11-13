@@ -120,7 +120,7 @@ void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 
 			ws.set_close_handler([this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error) {
 				BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << (int)close_status << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
-				handle_stop();
+				handle_stop(false);
 			});
 
 			try
@@ -323,7 +323,7 @@ void ConnectionPlasma::retail_handle_write(const boost::system::error_code& erro
 }
 
 
-void ConnectionPlasma::handle_stop()
+void ConnectionPlasma::handle_stop(bool crash)
 {
 	BOOST_LOG_NAMED_SCOPE("Plasma->handle_stop")
 
@@ -346,4 +346,10 @@ void ConnectionPlasma::handle_stop()
 	}
 
 	BOOST_LOG_TRIVIAL(info) << "Client Disconnected!";
+
+	if (crash)
+	{
+		// Throw an exception to restart proxy
+		throw ProxyStopException();
+	}
 }
