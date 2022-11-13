@@ -102,6 +102,9 @@
     <ClInclude Include="HttpHandler.hpp">
       <Filter>Header Files\proxy\http</Filter>
     </ClInclude>
+    <ClInclude Include="ProxyStopException.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

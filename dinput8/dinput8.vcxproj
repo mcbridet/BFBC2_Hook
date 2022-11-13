@@ -167,6 +167,7 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
     <ClInclude Include="ProxyCert.hpp" />
     <ClInclude Include="ProxyClient.hpp" />
     <ClInclude Include="ProxyHTTP.hpp" />
+    <ClInclude Include="ProxyStopException.hpp" />
     <ClInclude Include="ProxyTCP.hpp" />
     <ClInclude Include="ProxyUDP.hpp" />
     <ClInclude Include="Utils.hpp" />
