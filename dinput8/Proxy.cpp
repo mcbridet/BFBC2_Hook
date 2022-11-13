@@ -77,7 +77,7 @@ Proxy::Proxy()
 		}
 		catch (std::exception& e)
 		{
-			BOOST_LOG_TRIVIAL(error) << "An unhandled exception has occurred: " << e.what();
+			BOOST_LOG_TRIVIAL(fatal) << "An unhandled exception has occurred: " << e.what();
 			BOOST_LOG_TRIVIAL(info) << "Restarting proxy...";
 
 			continue;
