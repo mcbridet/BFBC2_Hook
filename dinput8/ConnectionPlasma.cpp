@@ -1,4 +1,4 @@
-#include "pch.hpp"
+﻿#include "pch.hpp"
 #include "ConnectionPlasma.hpp"
 
 #include "Config.hpp"
@@ -90,8 +90,12 @@ void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 							send_length = read_data.size();
 							incoming_data.close();
 
-							async_write(game_socket_, buffer(send_data, send_length),
-								boost::bind(&ConnectionPlasma::handle_write, shared_from_this(), placeholders::error));
+							if (connected_to_game)
+							{
+								async_write(game_socket_, buffer(send_data, send_length),
+									boost::bind(&ConnectionPlasma::handle_write, shared_from_this(), placeholders::error));
+							}
+
 							break;
 						}
 						case websocket_message_type::ping:
