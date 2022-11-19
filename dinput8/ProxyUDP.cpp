@@ -53,26 +53,39 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 		ProxyClient* pClient = &ProxyClient::getInstance();
 		pClient->theaterCtx = this;
 
-		try
+		Config* config = &Config::getInstance();
+
+		if (config->hook->connectRetail)
 		{
-			auto packet_data = new char[bytes_transferred];
-			memcpy(packet_data, received_data, bytes_transferred);
+			std::fill_n(pClient->udp_send_data, PACKET_MAX_LENGTH, 0);
+			memcpy(pClient->udp_send_data, received_data, bytes_transferred);
 
-			std::string msgcontent = std::string(packet_data, bytes_transferred);
-			std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
-
-			auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
-
-			websocket_outgoing_message msg;
-			msg.set_binary_message(is);
-
-			if (pClient->connected_to_theater)
-				pClient->theater_ws.send(msg);
+			socket_.async_send_to(asio::buffer(received_data, bytes_transferred), remote_endpoint_,
+				boost::bind(&ProxyUDP::handle_send, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 		}
-		catch (const websocket_exception& ex)
+		else
 		{
-			BOOST_LOG_TRIVIAL(error) << "handle_read() - Failed to write to websocket! (" << ex.what() << ")";
-			return handle_stop();
+			try
+			{
+				auto packet_data = new char[bytes_transferred];
+				memcpy(packet_data, received_data, bytes_transferred);
+
+				std::string msgcontent = std::string(packet_data, bytes_transferred);
+				std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
+
+				auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
+
+				websocket_outgoing_message msg;
+				msg.set_binary_message(is);
+
+				if (pClient->connected_to_theater)
+					pClient->theater_ws.send(msg);
+			}
+			catch (const websocket_exception& ex)
+			{
+				BOOST_LOG_TRIVIAL(error) << "handle_read() - Failed to write to websocket! (" << ex.what() << ")";
+				return handle_stop();
+			}
 		}
 
 		start_receive();
