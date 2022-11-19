@@ -170,8 +170,8 @@ void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_
 		const unsigned int packet_type = Utils::DecodeInt(received_data + 4, 4);
 		const unsigned int packet_length = Utils::DecodeInt(received_data + 8, 4);
 
-		const auto packet_data_raw = new char[packet_length - 12];
-		memcpy(packet_data_raw, received_data + 12, packet_length - 12);
+		const auto packet_data_raw = new char[received_length - 12];
+		memcpy(packet_data_raw, received_data + 12, received_length - 12);
 		std::string packet_data = Utils::GetPacketData(packet_data_raw);
 
 		BOOST_LOG_TRIVIAL(debug) << boost::format("-> %s %08x%08x {%s}") % packet_category % packet_type % packet_length % packet_data;
@@ -235,8 +235,8 @@ void ConnectionPlasma::handle_write(const boost::system::error_code& error)
 		const unsigned int packet_type = Utils::DecodeInt(send_data + 4, 4);
 		const unsigned int packet_length = Utils::DecodeInt(send_data + 8, 4);
 
-		const auto packet_data_raw = new char[packet_length - 12];
-		memcpy(packet_data_raw, send_data + 12, packet_length - 12);
+		const auto packet_data_raw = new char[send_length - 12];
+		memcpy(packet_data_raw, send_data + 12, send_length - 12);
 		std::string packet_data = Utils::GetPacketData(packet_data_raw);
 
 		BOOST_LOG_TRIVIAL(debug) << boost::format("<- %s %08x%08x {%s}") % packet_category % packet_type % packet_length % packet_data;
