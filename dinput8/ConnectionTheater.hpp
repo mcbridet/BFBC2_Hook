@@ -24,8 +24,6 @@ private:
 	unsigned char send_data[PACKET_MAX_LENGTH];
 	unsigned int send_length;
 
-	int receivedDataOffset = 0;
-
 	bool connected_to_game = false;
 	bool connected_to_retail = false;
 

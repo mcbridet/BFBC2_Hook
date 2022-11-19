@@ -59,7 +59,7 @@ void ConnectionTheater::handle_read(const system::error_code& error, size_t byte
 		Config* config = &Config::getInstance();
 		Hook* hook = &Hook::getInstance();
 
-		if (!pClient->connected_to_theater)
+		if (!pClient->connected_to_theater && !connected_to_retail)
 		{
 			if (config->hook->connectRetail)
 			{
@@ -224,15 +224,64 @@ void ConnectionTheater::handle_write(const boost::system::error_code& error)
 	}
 }
 
+void ConnectionTheater::retail_handle_connect(const boost::system::error_code& error)
+{
+	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_connect")
+
+	if (!error)
+	{
+		BOOST_LOG_TRIVIAL(info) << "Connected to retail server!";
+
+		connected_to_retail = true;
+
+		async_write(retail_socket_, buffer(received_data, received_length), boost::bind(&ConnectionTheater::retail_handle_write, shared_from_this(), asio::placeholders::error));
+		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+	}
+	else
+	{
+		BOOST_LOG_TRIVIAL(error) << "Connection to retail server failed! (" << error.message() << ")";
+		handle_stop();
+	}
+}
+
+void ConnectionTheater::retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred)
+{
+	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_read")
+
+	if (!error)
+	{
+		send_length = bytes_transferred;
+
+		async_write(game_socket_, buffer(send_data, send_length), boost::bind(&ConnectionTheater::handle_write, shared_from_this(), asio::placeholders::error));
+		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+	}
+	else
+	{
+		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
+		handle_stop();
+	}
+}
+
+void ConnectionTheater::retail_handle_write(const boost::system::error_code& error)
+{
+	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_write")
+
+	if (error)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
+		handle_stop();
+	}
+}
+
 void ConnectionTheater::handle_stop(bool crash)
 {
 	BOOST_LOG_NAMED_SCOPE("Theater->handle_stop")
 
-	if (connected_to_retail)
-	{
-		connected_to_retail = false;
-		retail_socket_.lowest_layer().close();
-	}
+		if (connected_to_retail)
+		{
+			connected_to_retail = false;
+			retail_socket_.lowest_layer().close();
+		}
 
 	ProxyClient* pClient = &ProxyClient::getInstance();
 
@@ -254,63 +303,5 @@ void ConnectionTheater::handle_stop(bool crash)
 	{
 		// Throw an exception to restart proxy
 		throw ProxyStopException();
-	}
-}
-
-void ConnectionTheater::retail_handle_connect(const boost::system::error_code& error)
-{
-	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_connect")
-
-	if (!error)
-	{
-		BOOST_LOG_TRIVIAL(info) << "Connected to retail server!";
-
-		connected_to_retail = true;
-		async_write(retail_socket_, buffer(received_data, received_length), boost::bind(&ConnectionTheater::retail_handle_write, shared_from_this(), asio::placeholders::error));
-
-		game_socket_.async_read_some(buffer(received_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
-	}
-	else
-	{
-		BOOST_LOG_TRIVIAL(error) << "Connection to retail server failed! (" << error.message() << ")";
-		handle_stop();
-	}
-}
-
-void ConnectionTheater::retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred)
-{
-	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_read")
-
-	if (!error)
-	{
-		send_length = bytes_transferred;
-
-		if (send_data[(send_length + receivedDataOffset) - 1] != NULL)
-		{
-			receivedDataOffset += send_length;
-			retail_socket_.async_read_some(buffer(send_data + receivedDataOffset, PACKET_MAX_LENGTH - receivedDataOffset), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
-			return;
-		}
-
-		async_write(game_socket_, buffer(send_data, send_length + receivedDataOffset), boost::bind(&ConnectionTheater::handle_write, shared_from_this(), asio::placeholders::error));
-
-		receivedDataOffset = NULL;
-		retail_socket_.async_read_some(buffer(send_data, PACKET_MAX_LENGTH), bind(&ConnectionTheater::retail_handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
-	}
-	else
-	{
-		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
-		handle_stop();
-	}
-}
-
-void ConnectionTheater::retail_handle_write(const boost::system::error_code& error)
-{
-	BOOST_LOG_NAMED_SCOPE("Theater->retail_handle_write")
-
-	if (error)
-	{
-		BOOST_LOG_TRIVIAL(error) << "Error message: " << error.message() << ", error code: " << error.value();
-		handle_stop();
 	}
 }
