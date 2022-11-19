@@ -35,6 +35,8 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 
 	if (!error)
 	{
+		Config* config = &Config::getInstance();
+
 		auto request_header = request_.base();
 
 		auto host = request_header["Host"];
@@ -59,19 +61,27 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		auto target = request_header.target();
 		logTarget = target.to_string();
 
-		if (host.starts_with("easo.ea.com"))
+		if (!config->hook->connectRetail && host.starts_with("easo.ea.com"))
 		{
 			// Easo contains static xml files, add /static to path
 			target = "/static" + target.to_string();
 		}
 
-		Config* config = &Config::getInstance();
+		std::wstring httpFinalPath;
 
-		std::wstring httpFinalPath = config->hook->serverSecure ? L"https://" : L"http://";
-		httpFinalPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
-		httpFinalPath += L":";
-		httpFinalPath += std::to_wstring(config->hook->serverPort);
-		httpFinalPath += std::wstring(target.begin(), target.end());
+		if (config->hook->connectRetail)
+		{
+			httpFinalPath = L"http://" + std::wstring(host.begin(), host.end());
+			httpFinalPath += std::wstring(target.begin(), target.end());
+		}
+		else
+		{
+			httpFinalPath = config->hook->serverSecure ? L"https://" : L"http://";
+			httpFinalPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
+			httpFinalPath += L":";
+			httpFinalPath += std::to_wstring(config->hook->serverPort);
+			httpFinalPath += std::wstring(target.begin(), target.end());
+		}
 
 		http_client client(httpFinalPath);
 
