@@ -66,13 +66,7 @@ Proxy::Proxy()
 		{
 			// Either retail or websocket were disconnected, clean up memory by restarting proxy
 			BOOST_LOG_TRIVIAL(info) << "Restarting proxy...";
-
-			if (proxyClient->connected_to_theater)
-			{
-				proxyClient->connected_to_theater = false;
-				proxyClient->theater_ws.close();
-			}
-
+			proxyClient->theater_ws.close();
 			continue;
 		}
 		catch (std::exception& e)
