@@ -4,10 +4,10 @@
 
 using namespace boost;
 using namespace asio;
-using asio::ip::tcp;
+using ip::tcp;
 namespace http = beast::http;
 using namespace web::http;
-using namespace web::http::client;
+using namespace client;
 
 HttpHandler::HttpHandler(io_service& io_service) : game_socket_(io_service), retail_socket_(io_service)
 {
@@ -42,7 +42,7 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		auto host = request_header["Host"];
 
 		auto boostMethod = request_header.method();
-		web::http::method sdkMethod;
+		method sdkMethod;
 
 		switch (boostMethod)
 		{
@@ -96,7 +96,7 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 			Concurrency::streams::stringstreambuf response_buffer;
 
 			client.request(sdkMethod)
-				.then([&content_type, &result, &response_buffer](const web::http::http_response& response) {
+				.then([&content_type, &result, &response_buffer](const http_response& response) {
 					utility::string_t ct = response.headers().content_type();
 					content_type = std::string(ct.begin(), ct.end());
 					result = response.status_code();
@@ -105,14 +105,14 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 
 			response_.result(result);
 			response_.set(http::field::content_type, content_type);
-			beast::ostream(response_.body()) << response_buffer.collection();
+			ostream(response_.body()) << response_buffer.collection();
 		}
 		catch (std::exception& e)
 		{
 			BOOST_LOG_TRIVIAL(error) << "[HTTP Request Handler]: Failure while doing HTTP request to origin server! (" << e.what() << ")";
 			response_.result(http::status::internal_server_error);
 			response_.set(http::field::content_type, "text/html");
-			beast::ostream(response_.body()) << "<h1>Proxy Error</h1><br/>" << e.what() << "<br/><br/><hr>Battlefield: Bad Company 2 Master Server Emulator by Marek Grzyb (@GrzybDev).\r\n";
+			ostream(response_.body()) << "<h1>Proxy Error</h1><br/>" << e.what() << "<br/><br/><hr>Battlefield: Bad Company 2 Master Server Emulator by Marek Grzyb (@GrzybDev).\r\n";
 		}
 
 		response_.content_length(response_.body().size());
@@ -124,5 +124,5 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 
 void HttpHandler::handle_write(const system::error_code& error, size_t bytes_transferred)
 {
-	BOOST_LOG_TRIVIAL(debug) << boost::format("%s %s [%s]") % request_.method_string() % logTarget % response_.result_int();
+	BOOST_LOG_TRIVIAL(debug) << format("%s %s [%s]") % request_.method_string() % logTarget % response_.result_int();
 }
