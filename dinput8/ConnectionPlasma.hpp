@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "ConnectionRetail.hpp"
+#include "ConnectionWebSocket.hpp"
 
 typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socketSSL;
 
@@ -9,35 +11,23 @@ public:
 	typedef boost::shared_ptr<ConnectionPlasma> pointer;
 
 	socketSSL::lowest_layer_type& gameSocket();
-	socketSSL::lowest_layer_type& retailSocket();
 
 	void start();
 
 private:
-	web::websockets::client::websocket_callback_client ws;
+	ConnectionRetail* retailCtx;
+	ConnectionWebSocket* wsCtx;
 
 	socketSSL game_socket_;
-	socketSSL retail_socket_;
 
 	void handle_handshake(const boost::system::error_code& error);						// first sequence of packets for ssl connection
 	void handle_read(const boost::system::error_code& error, size_t bytes_transferred); // normal read
-	void handle_write(const boost::system::error_code& error);							// normal send (also deals with multiple packets)
 	void handle_stop(bool crash = true);												// cleanup after a disconnect
 
-	void retail_handle_connect(const boost::system::error_code& error);
-	void retail_handle_handshake(const boost::system::error_code& error);
-	void retail_handle_read(const boost::system::error_code& error, size_t bytes_transferred);
-	void retail_handle_write(const boost::system::error_code& error);
+	void sendToGame(unsigned char* data, int length);
 
-	bool connected_to_ws = false;
-	bool connected_to_game = false;
-	bool connected_to_retail = false;
+	bool connected = false;
 
-	unsigned char received_data[PACKET_MAX_LENGTH];
-	unsigned int received_length;
-
-	int receivedDataOffset = 0;
-
-	unsigned char send_data[PACKET_MAX_LENGTH];
-	unsigned int send_length;
+	unsigned char receive_buffer[PACKET_MAX_LENGTH];
+	unsigned int receive_length;
 };
