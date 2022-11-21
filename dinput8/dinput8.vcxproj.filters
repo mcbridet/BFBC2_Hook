@@ -105,6 +105,9 @@
     <ClInclude Include="ProxyStopException.hpp">
       <Filter>Header Files\proxy</Filter>
     </ClInclude>
+    <ClInclude Include="ConnectionRetail.hpp">
+      <Filter>Header Files\proxy\connection</Filter>
+    </ClInclude>
     <ClInclude Include="Packet.hpp">
       <Filter>Header Files\proxy</Filter>
     </ClInclude>
@@ -160,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="HttpHandler.cpp">
       <Filter>Source Files\proxy\http</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionRetail.cpp">
+      <Filter>Source Files\proxy\connection</Filter>
     </ClCompile>
     <ClCompile Include="Packet.cpp">
       <Filter>Source Files\proxy</Filter>

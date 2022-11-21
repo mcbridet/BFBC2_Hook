@@ -152,6 +152,7 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Config.hpp" />
+    <ClInclude Include="ConnectionRetail.hpp" />
     <ClInclude Include="ConnectionTheater.hpp" />
     <ClInclude Include="ConnectionPlasma.hpp" />
     <ClInclude Include="dinput8.hpp" />
@@ -176,6 +177,7 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="ConnectionRetail.cpp" />
     <ClCompile Include="ConnectionTheater.cpp" />
     <ClCompile Include="ConnectionPlasma.cpp" />
     <ClCompile Include="dinput8.cpp" />
