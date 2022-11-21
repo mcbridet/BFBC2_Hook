@@ -30,3 +30,5 @@
 #include "ProxyCert.hpp"
 #include "ExecutableType.hpp"
 #include "ProxyStopException.hpp"
+#include "ProxyType.hpp"
+#include "Packet.hpp"
