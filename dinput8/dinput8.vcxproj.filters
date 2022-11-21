@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -114,6 +114,9 @@
     <ClInclude Include="ProxyType.hpp">
       <Filter>Header Files\proxy</Filter>
     </ClInclude>
+    <ClInclude Include="ConnectionWebSocket.hpp">
+      <Filter>Header Files\proxy\connection</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -169,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="Packet.cpp">
       <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionWebSocket.cpp">
+      <Filter>Source Files\proxy\connection</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
