@@ -46,12 +46,12 @@ Proxy::Proxy()
 				return;
 
 			BOOST_LOG_TRIVIAL(info) << "Initializing...";
-			ProxyTCP* plasmaProxy = new ProxyTCP(io_service, plasmaPort, true);
+			auto plasmaProxy = new ProxyTCP(io_service, plasmaPort, true);
 
-			ProxyTCP* theaterProxyTCP = new ProxyTCP(io_service, theaterPort, false);
-			ProxyUDP* theaterProxyUDP = new ProxyUDP(io_service, theaterPort);
+			auto theaterProxyTCP = new ProxyTCP(io_service, theaterPort, false);
+			auto theaterProxyUDP = new ProxyUDP(io_service, theaterPort);
 
-			ProxyHTTP* httpProxy = new ProxyHTTP(io_service, HTTP_PORT);
+			auto httpProxy = new ProxyHTTP(io_service, HTTP_PORT);
 
 			if (config->hook->connectRetail)
 			{

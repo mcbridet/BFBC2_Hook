@@ -14,16 +14,16 @@ void LoadSystemLibrary(const char* libraryName)
 	OriginalLibrary = LoadLibraryA(libraryPath);
 
 	if (OriginalLibrary > reinterpret_cast<HMODULE>(31))
-		OriginalFunction = reinterpret_cast<DirectInput8Create_t>(  // NOLINT(clang-diagnostic-cast-function-type)
+		OriginalFunction = reinterpret_cast<DirectInput8Create_t>( // NOLINT(clang-diagnostic-cast-function-type)
 			GetProcAddress(OriginalLibrary, "DirectInput8Create"));
 }
 
 void UnprotectGameMemory()
 {
-	HMODULE hModule = GetModuleHandle(NULL);
+	HMODULE hModule = GetModuleHandle(nullptr);
 
-	PIMAGE_DOS_HEADER header = (PIMAGE_DOS_HEADER)hModule;
-	PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD)hModule + header->e_lfanew);
+	auto header = (PIMAGE_DOS_HEADER)hModule;
+	auto ntHeader = (PIMAGE_NT_HEADERS)((DWORD)hModule + header->e_lfanew);
 
 	// Unprotect the entire PE image
 	SIZE_T size = ntHeader->OptionalHeader.SizeOfImage;

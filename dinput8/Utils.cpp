@@ -40,7 +40,7 @@ DWORD Utils::FindPattern(DWORD dwStart, DWORD dwLen, BYTE* pszPatt, const char p
 		if (*(BYTE*)dwRet == pszPatt[i] || pszMask[i] == '?')
 		{
 			if (pszMask[i + 1] == '\0')
-				return(dwRet - iLen);
+				return (dwRet - iLen);
 
 			i++;
 		}
@@ -53,17 +53,17 @@ DWORD Utils::FindPattern(DWORD dwStart, DWORD dwLen, BYTE* pszPatt, const char p
 
 DWORD Utils::GetSizeOfCode(HANDLE hHandle)
 {
-	HMODULE hModule = (HMODULE)hHandle;
+	auto hModule = static_cast<HMODULE>(hHandle);
 
 	if (!hModule)
 		return NULL;
 
-	PIMAGE_DOS_HEADER pDosHeader = PIMAGE_DOS_HEADER(hModule);
+	auto pDosHeader = PIMAGE_DOS_HEADER(hModule);
 
 	if (!pDosHeader)
 		return NULL;
 
-	PIMAGE_NT_HEADERS pNTHeader = PIMAGE_NT_HEADERS((LONG)hModule + pDosHeader->e_lfanew);
+	auto pNTHeader = PIMAGE_NT_HEADERS((LONG)hModule + pDosHeader->e_lfanew);
 
 	if (!pNTHeader)
 		return NULL;
@@ -78,17 +78,17 @@ DWORD Utils::GetSizeOfCode(HANDLE hHandle)
 
 DWORD Utils::OffsetToCode(HANDLE hHandle)
 {
-	HMODULE hModule = (HMODULE)hHandle;
+	auto hModule = static_cast<HMODULE>(hHandle);
 
 	if (!hModule)
 		return NULL;
 
-	PIMAGE_DOS_HEADER pDosHeader = PIMAGE_DOS_HEADER(hModule);
+	auto pDosHeader = PIMAGE_DOS_HEADER(hModule);
 
 	if (!pDosHeader)
 		return NULL;
 
-	PIMAGE_NT_HEADERS pNTHeader = PIMAGE_NT_HEADERS((LONG)hModule + pDosHeader->e_lfanew);
+	auto pNTHeader = PIMAGE_NT_HEADERS((LONG)hModule + pDosHeader->e_lfanew);
 
 	if (!pNTHeader)
 		return NULL;
@@ -118,7 +118,7 @@ std::string Utils::GetPacketData(std::string data)
 
 	const boost::char_separator<char> token_sep("\n");
 
-	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+	using tokenizer = boost::tokenizer<boost::char_separator<char>>;
 	tokenizer tokens(data, token_sep);
 
 	BOOST_FOREACH(std::string const& token, tokens)

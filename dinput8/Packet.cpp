@@ -34,10 +34,11 @@ Packet::Packet(unsigned char* data, unsigned int data_length)
 
 		if (isIncomplete)
 		{
-			BOOST_LOG_TRIVIAL(error) << "Invalid data length! (Expected: " << expected_data_length << ", Got: " << received_data_length << ")";
+			BOOST_LOG_TRIVIAL(error) << "Invalid data length! (Expected: " << expected_data_length << ", Got: " <<
+ received_data_length << ")";
 			return;
 		}
-	} 
+	}
 
 	this->data = Utils::GetPacketData(data_raw);
 	isValid = true;

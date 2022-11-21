@@ -14,10 +14,10 @@ private:
 	int port;
 
 	enum { max_length = 1024 };
+
 	unsigned char received_data[max_length];
 
 	void start_receive();
 	void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
 	void handle_stop();
 };
-

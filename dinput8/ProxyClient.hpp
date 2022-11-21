@@ -4,23 +4,29 @@
 class ProxyClient
 {
 public:
-    ProxyClient() {}
-    ProxyClient(const ProxyClient&) {}
+	ProxyClient()
+	{
+	}
 
-    static ProxyClient& getInstance() {
-        static ProxyClient* _instance = nullptr;
+	ProxyClient(const ProxyClient&)
+	{
+	}
 
-        if (_instance == nullptr)
-            _instance = new ProxyClient();
+	static ProxyClient& getInstance()
+	{
+		static ProxyClient* _instance = nullptr;
 
-        return *_instance;
-    }
+		if (_instance == nullptr)
+			_instance = new ProxyClient();
 
-    boost::asio::ip::tcp::resolver* tcpResolver;
+		return *_instance;
+	}
 
-    ProxyUDP* theaterCtx;
-    web::websockets::client::websocket_callback_client theater_ws;
+	boost::asio::ip::tcp::resolver* tcpResolver;
+
+	ProxyUDP* theaterCtx;
+	web::websockets::client::websocket_callback_client theater_ws;
 
 	unsigned char udp_send_data[PACKET_MAX_LENGTH];
-    unsigned int udp_send_length = 0;
+	unsigned int udp_send_length = 0;
 };

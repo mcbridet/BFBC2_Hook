@@ -9,7 +9,9 @@ using namespace ip;
 using namespace web;
 using namespace websockets::client;
 
-ConnectionRetail::ConnectionRetail(ProxyType type, std::function<void(unsigned char*, unsigned int)> sendToGame, std::function<void()> closeCallback, io_service& io_service, ssl::context& context) : retail_socket_ssl_(io_service, context), retail_socket_(io_service)
+ConnectionRetail::ConnectionRetail(ProxyType type, std::function<void(unsigned char*, unsigned int)> sendToGame,
+                                   std::function<void()> closeCallback, io_service& io_service, ssl::context& context) :
+	retail_socket_ssl_(io_service, context), retail_socket_(io_service)
 {
 	this->type = type;
 
@@ -66,9 +68,13 @@ void ConnectionRetail::connectToRetail()
 	std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
 
 	if (type == PLASMA)
-		retail_socket_ssl_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+		retail_socket_ssl_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		                                   bind(&ConnectionRetail::handle_read, this, placeholders::error,
+		                                        placeholders::bytes_transferred));
 	else
-		retail_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+		retail_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		                               bind(&ConnectionRetail::handle_read, this, placeholders::error,
+		                                    placeholders::bytes_transferred));
 }
 
 
@@ -87,11 +93,14 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 
 			if (!packet.isValid)
 			{
-				retail_socket_ssl_.async_read_some(buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length), bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+				retail_socket_ssl_.async_read_some(
+					buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length),
+					bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
 				return;
 			}
 
-			BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) % packet.category % packet.type % packet.length % packet.data;
+			BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port)
+ % packet.category % packet.type % packet.length % packet.data;
 			sendToGame(receive_buffer, receive_length);
 		}
 		else
@@ -103,8 +112,9 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 
 			while (true)
 			{
-				unsigned int length = length = Utils::DecodeInt(receive_buffer + current_offset + LENGTH_OFFSET, HEADER_VALUE_LENGTH);
-				Packet* packet = new Packet(receive_buffer + current_offset, length);
+				unsigned int length = length = Utils::DecodeInt(receive_buffer + current_offset + LENGTH_OFFSET,
+				                                                HEADER_VALUE_LENGTH);
+				auto packet = new Packet(receive_buffer + current_offset, length);
 
 				if (!packet->isValid)
 				{
@@ -128,9 +138,12 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 						}
 
 						receive_length = 0;
-						retail_socket_.async_read_some(buffer(receive_buffer + part_end_offset, PACKET_MAX_LENGTH - part_end_offset), bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+						retail_socket_.async_read_some(
+							buffer(receive_buffer + part_end_offset, PACKET_MAX_LENGTH - part_end_offset),
+							bind(&ConnectionRetail::handle_read, this, placeholders::error,
+							     placeholders::bytes_transferred));
 						return;
-;					}
+					}
 
 					// Invalid packet
 					break;
@@ -138,7 +151,8 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 
 				current_offset += length;
 
-				BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) % packet->category % packet->type % packet->length % packet->data;
+				BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" +
+					port) % packet->category % packet->type % packet->length % packet->data;
 				sendToGame(receive_buffer + current_offset - length, length);
 			}
 		}
@@ -147,9 +161,13 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 		std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
 
 		if (type == PLASMA)
-			retail_socket_ssl_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+			retail_socket_ssl_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+			                                   bind(&ConnectionRetail::handle_read, this, placeholders::error,
+			                                        placeholders::bytes_transferred));
 		else
-			retail_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+			retail_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+			                               bind(&ConnectionRetail::handle_read, this, placeholders::error,
+			                                    placeholders::bytes_transferred));
 	}
 	else
 	{
@@ -173,7 +191,8 @@ void ConnectionRetail::sendToRetail(unsigned char* data, unsigned int length)
 	else
 		write(retail_socket_, buffer(data, length));
 
-	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) % packet.category % packet.type % packet.length % packet.data;
+	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) %
+ packet.category % packet.type % packet.length % packet.data;
 }
 
 void ConnectionRetail::close()

@@ -7,24 +7,28 @@ class Hook
 {
 public:
 	Hook();
-    Hook(const Hook&) {}
 
-    static Hook& getInstance() {
-        static Hook* _instance = nullptr;
+	Hook(const Hook&)
+	{
+	}
 
-        if (_instance == nullptr)
-            _instance = new Hook();
+	static Hook& getInstance()
+	{
+		static Hook* _instance = nullptr;
 
-        return *_instance;
-    }
+		if (_instance == nullptr)
+			_instance = new Hook();
 
-    EXECUTABLE_TYPE exeType;
+		return *_instance;
+	}
+
+	EXECUTABLE_TYPE exeType;
 
 private:
-    Config* config;
+	Config* config;
 
 	static void ConsoleIntro();
-    void InitLogging();
+	void InitLogging();
 
-    void VerifyGameVersion();
+	void VerifyGameVersion();
 };

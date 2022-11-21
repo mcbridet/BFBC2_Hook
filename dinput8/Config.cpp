@@ -22,14 +22,15 @@ void Config::readConfig() const
 	{
 		// Will use defaults in case of parse error
 
-		if (boost::filesystem::exists(configPath)) {
+		if (boost::filesystem::exists(configPath))
+		{
 			// Print parse error only if it's actual parse error
-			std::string temp = std::string(e.what());
-			std::wstring errMessage = std::wstring(temp.begin(), temp.end());
+			auto temp = std::string(e.what());
+			auto errMessage = std::wstring(temp.begin(), temp.end());
 			std::wstring message = L"Hook will use default configs because error occured while parsing config file: ";
 			message += errMessage;
 
-			MessageBox(NULL, message.c_str(), L"Config Parse Error", MB_ICONEXCLAMATION | MB_OK);
+			MessageBox(nullptr, message.c_str(), L"Config Parse Error", MB_ICONEXCLAMATION | MB_OK);
 		}
 	}
 
@@ -43,15 +44,15 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	hook->createLog = pt.get("debug.createLog", false);
 
 	boost::posix_time::ptime timeLocal = boost::posix_time::second_clock::local_time();
-	boost::posix_time::time_facet* facet = new boost::posix_time::time_facet("%Y-%m-%d_%H-%M-%S");
+	auto facet = new boost::posix_time::time_facet("%Y-%m-%d_%H-%M-%S");
 
 	std::ostringstream is;
 	is.imbue(std::locale(is.getloc(), facet));
 	is << timeLocal;
 
 	hook->logPath = pt.get("debug.logPath", (boost::format("bfbc2_%1%.log") % is.str()).str());
-	hook->consoleLogLevel = pt.get("debug.logLevelConsole", (int)boost::log::trivial::info);
-	hook->fileLogLevel = pt.get("debug.logLevelFile", (int)boost::log::trivial::debug);
+	hook->consoleLogLevel = pt.get("debug.logLevelConsole", static_cast<int>(boost::log::trivial::info));
+	hook->fileLogLevel = pt.get("debug.logLevelFile", static_cast<int>(boost::log::trivial::debug));
 
 	// Section - Patches
 	hook->verifyGameVersion = pt.get("patches.verifyGameVersion", true);

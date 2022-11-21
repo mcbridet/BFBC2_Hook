@@ -8,7 +8,8 @@
 using namespace web;
 using namespace websockets::client;
 
-ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsigned char*, unsigned)> sendToGame, std::function<void()> closeCallback)
+ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsigned char*, unsigned)> sendToGame,
+                                         std::function<void()> closeCallback)
 {
 	this->type = type;
 
@@ -17,8 +18,12 @@ ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsi
 
 	connected = false;
 
-	ws.set_message_handler([this](websocket_incoming_message msg) {handle_receive(msg);});
-	ws.set_close_handler([this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error) { handle_disconnect(close_status, reason, error); });
+	ws.set_message_handler([this](websocket_incoming_message msg) { handle_receive(msg); });
+	ws.set_close_handler(
+		[this](websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error)
+		{
+			handle_disconnect(close_status, reason, error);
+		});
 
 	Config* config = &Config::getInstance();
 	Hook* hook = &Hook::getInstance();
@@ -28,7 +33,7 @@ ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsi
 	wsPath += L":";
 	wsPath += std::to_wstring(config->hook->serverPort);
 	wsPath += type == PLASMA ? L"/plasma/" : L"/theater/";
-	wsPath += (hook->exeType == CLIENT) ? L"client" : L"server"; 
+	wsPath += (hook->exeType == CLIENT) ? L"client" : L"server";
 }
 
 void ConnectionWebSocket::connect()
@@ -48,7 +53,7 @@ void ConnectionWebSocket::connect()
 	{
 		BOOST_LOG_TRIVIAL(error) << "Failed to connect to server! (" << ex.what() << ")";
 		close();
-	} 
+	}
 }
 
 void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
@@ -66,7 +71,7 @@ void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
 		auto packet_data = new char[length];
 		memcpy(packet_data, data, length);
 
-		std::string msgcontent = std::string(packet_data, length);
+		auto msgcontent = std::string(packet_data, length);
 		std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
 
 		auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
@@ -75,27 +80,29 @@ void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
 		msg.set_binary_message(is);
 
 		ws.send(msg).wait();
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") %
+ std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
 	}
 	catch (const websocket_exception& ex)
 	{
 		BOOST_LOG_TRIVIAL(error) << "send() - Failed to write to websocket! (" << ex.what() << ")";
 		close();
-	} 
+	}
 }
 
 void ConnectionWebSocket::handle_receive(websocket_incoming_message msg)
 {
-	try {
+	try
+	{
 		switch (msg.message_type())
 		{
-			case websocket_message_type::text_message:
-				return handle_text_message(msg.extract_string().get());
-			case websocket_message_type::binary_message:
-				return handle_binary_message(msg.body());
-			case websocket_message_type::ping:
-				return handle_ping(msg.body());
-			default: break;
+		case websocket_message_type::text_message:
+			return handle_text_message(msg.extract_string().get());
+		case websocket_message_type::binary_message:
+			return handle_binary_message(msg.body());
+		case websocket_message_type::ping:
+			return handle_ping(msg.body());
+		default: break;
 		}
 	}
 	catch (const websocket_exception& ex)
@@ -116,7 +123,7 @@ void ConnectionWebSocket::handle_binary_message(Concurrency::streams::istream bi
 	binaryMessage.read_to_end(incoming_data).wait();
 
 	std::vector<uint8_t> read_data = incoming_data.collection();
-	unsigned char* send_buffer = new unsigned char[PACKET_MAX_LENGTH];
+	auto send_buffer = new unsigned char[PACKET_MAX_LENGTH];
 	std::fill_n(send_buffer, PACKET_MAX_LENGTH, 0);
 	unsigned int length = read_data.size();
 	memcpy(send_buffer, read_data.data(), length);
@@ -141,15 +148,18 @@ void ConnectionWebSocket::handle_binary_message(Concurrency::streams::istream bi
 		pClient->theaterCtx->socket_.async_send_to(
 			boost::asio::buffer(send_buffer, length),
 			pClient->theaterCtx->remote_endpoint_,
-			boost::bind(&ProxyUDP::handle_send, pClient->theaterCtx, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)
+			boost::bind(&ProxyUDP::handle_send, pClient->theaterCtx, boost::asio::placeholders::error,
+			            boost::asio::placeholders::bytes_transferred)
 		);
 
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] [PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] [PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") %
+ std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
 	}
 	else
 	{
 		sendToGame(send_buffer, length);
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") %
+ std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
 	}
 }
 
@@ -176,9 +186,12 @@ void ConnectionWebSocket::handle_ping(Concurrency::streams::istream ping)
 	}
 }
 
-void ConnectionWebSocket::handle_disconnect(websocket_close_status close_status, const utility::string_t& reason, const std::error_code& error)
+void ConnectionWebSocket::handle_disconnect(websocket_close_status close_status, const utility::string_t& reason,
+                                            const std::error_code& error)
 {
-	BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << (int)close_status << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
+	BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << static_cast<int>(close_status) <<
+ ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str()
+ << "))";
 	connected = false;
 	closeCallback();
 }

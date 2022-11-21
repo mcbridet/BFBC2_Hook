@@ -5,17 +5,21 @@ hostent* __stdcall DNSResolve(const char* hostname);
 class PatchDNS
 {
 public:
-    PatchDNS();
-    PatchDNS(const PatchDNS&) {}
+	PatchDNS();
 
-    static PatchDNS& getInstance() {
-        static PatchDNS* _instance = nullptr;
+	PatchDNS(const PatchDNS&)
+	{
+	}
 
-        if (_instance == nullptr)
-            _instance = new PatchDNS();
+	static PatchDNS& getInstance()
+	{
+		static PatchDNS* _instance = nullptr;
 
-        return *_instance;
-    }
+		if (_instance == nullptr)
+			_instance = new PatchDNS();
 
-    bool patchDNSResolution();
+		return *_instance;
+	}
+
+	bool patchDNSResolution();
 };

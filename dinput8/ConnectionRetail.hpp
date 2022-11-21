@@ -2,12 +2,14 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
 
-typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socketSSL;
+using socketSSL = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 
 class ConnectionRetail
 {
 public:
-	ConnectionRetail(ProxyType type, std::function<void(unsigned char*, unsigned int)> sendToGame, std::function<void()> closeCallback, boost::asio::io_service& io_service, boost::asio::ssl::context& context);
+	ConnectionRetail(ProxyType type, std::function<void(unsigned char*, unsigned int)> sendToGame,
+	                 std::function<void()> closeCallback, boost::asio::io_service& io_service,
+	                 boost::asio::ssl::context& context);
 
 	socketSSL::lowest_layer_type& retailSocketSSL();
 	boost::asio::ip::tcp::socket& retailSocket();

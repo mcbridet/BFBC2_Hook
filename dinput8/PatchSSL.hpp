@@ -3,24 +3,28 @@
 class PatchSSL
 {
 public:
-    PatchSSL();
-    PatchSSL(const PatchSSL&) {}
+	PatchSSL();
 
-    static PatchSSL& getInstance() {
-        static PatchSSL* _instance = nullptr;
+	PatchSSL(const PatchSSL&)
+	{
+	}
 
-        if (_instance == nullptr)
-            _instance = new PatchSSL();
+	static PatchSSL& getInstance()
+	{
+		static PatchSSL* _instance = nullptr;
 
-        return *_instance;
-    }
+		if (_instance == nullptr)
+			_instance = new PatchSSL();
 
-    bool patchSSLVerification();
+		return *_instance;
+	}
+
+	bool patchSSLVerification();
 
 private:
-    bool enablePatch;
+	bool enablePatch;
 
-    DWORD dwCodeSize;
-    DWORD dwCodeOffset;
-    DWORD dwEntryPoint;
+	DWORD dwCodeSize;
+	DWORD dwCodeOffset;
+	DWORD dwEntryPoint;
 };

@@ -6,7 +6,7 @@ DirectInput8Create_t OriginalFunction = nullptr;
 HMODULE OriginalLibrary = nullptr;
 
 DINPUT8_API HRESULT DirectInput8Create(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut,
-	LPUNKNOWN punkOuter)
+                                       LPUNKNOWN punkOuter)
 {
 	if (OriginalFunction)
 		return OriginalFunction(hinst, dwVersion, riidltf, ppvOut, punkOuter);

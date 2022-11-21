@@ -35,7 +35,8 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 		unsigned int packet_length = Utils::DecodeInt(received_data + 8, 4);
 
 		Packet packet(received_data, packet_length);
-		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.
+category % packet.type % packet.length % packet.data;
 
 		ProxyClient* pClient = &ProxyClient::getInstance();
 		pClient->theaterCtx = this;
@@ -48,7 +49,8 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 			memcpy(pClient->udp_send_data, received_data, bytes_transferred);
 
 			socket_.async_send_to(buffer(received_data, bytes_transferred), remote_endpoint_,
-			                      boost::bind(&ProxyUDP::handle_send, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+			                      boost::bind(&ProxyUDP::handle_send, this, asio::placeholders::error,
+			                                  asio::placeholders::bytes_transferred));
 		}
 		else
 		{
@@ -57,7 +59,7 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 				auto packet_data = new char[bytes_transferred];
 				memcpy(packet_data, received_data, bytes_transferred);
 
-				std::string msgcontent = std::string(packet_data, bytes_transferred);
+				auto msgcontent = std::string(packet_data, bytes_transferred);
 				std::vector<uint8_t> msgbuf(msgcontent.begin(), msgcontent.end());
 
 				auto is = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(msgbuf));
@@ -74,7 +76,8 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 			}
 		}
 
-		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % remote_endpoint_.address().to_string() % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % remote_endpoint_.
+address().to_string() % packet.category % packet.type % packet.length % packet.data;
 		start_receive();
 	}
 }

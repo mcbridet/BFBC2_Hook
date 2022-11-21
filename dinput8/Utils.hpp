@@ -3,13 +3,13 @@
 class Utils
 {
 public:
-    static void CenterPrint(std::string text, const char* fillChar, bool newLine);
-    static void PrintChar(const char* charToPrint, unsigned int count);
+	static void CenterPrint(std::string text, const char* fillChar, bool newLine);
+	static void PrintChar(const char* charToPrint, unsigned int count);
 
-    static DWORD FindPattern(DWORD dwStart, DWORD dwLen, BYTE* pszPatt, const char pszMask[]);
-    static DWORD OffsetToCode(HANDLE hHandle);
-    static DWORD GetSizeOfCode(HANDLE hHandle);
+	static DWORD FindPattern(DWORD dwStart, DWORD dwLen, BYTE* pszPatt, const char pszMask[]);
+	static DWORD OffsetToCode(HANDLE hHandle);
+	static DWORD GetSizeOfCode(HANDLE hHandle);
 
-    static UINT DecodeInt(unsigned char* data, int bytes);
-    static std::string GetPacketData(std::string data);
+	static UINT DecodeInt(unsigned char* data, int bytes);
+	static std::string GetPacketData(std::string data);
 };

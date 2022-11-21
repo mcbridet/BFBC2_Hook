@@ -8,16 +8,16 @@ using ip::tcp;
 using namespace web;
 using namespace websockets::client;
 
-ConnectionTheater::ConnectionTheater(io_service& io_service, boost::asio::ssl::context& context) : game_socket_(io_service)
+ConnectionTheater::ConnectionTheater(io_service& io_service, ssl::context& context) : game_socket_(io_service)
 {
-	retailCtx = new ConnectionRetail(THEATER, 
-		[=](unsigned char* data, int length) {sendToGame(data, length); },
-		[=]() {handle_stop(); },
-		io_service, context);
+	retailCtx = new ConnectionRetail(THEATER,
+	                                 [=](unsigned char* data, int length) { sendToGame(data, length); },
+	                                 [=]() { handle_stop(); },
+	                                 io_service, context);
 
-	wsCtx = new ConnectionWebSocket(THEATER, 
-		[=](unsigned char* data, int length) {sendToGame(data, length); },
-		[=]() {handle_stop(false); });
+	wsCtx = new ConnectionWebSocket(THEATER,
+	                                [=](unsigned char* data, int length) { sendToGame(data, length); },
+	                                [=]() { handle_stop(false); });
 }
 
 tcp::socket& ConnectionTheater::gameSocket()
@@ -28,7 +28,9 @@ tcp::socket& ConnectionTheater::gameSocket()
 void ConnectionTheater::start()
 {
 	std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
-	game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), bind(&ConnectionTheater::handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+	game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+	                             bind(&ConnectionTheater::handle_read, shared_from_this(), asio::placeholders::error,
+	                                  asio::placeholders::bytes_transferred));
 }
 
 void ConnectionTheater::handle_read(const system::error_code& error, size_t bytes_transferred)
@@ -53,11 +55,14 @@ void ConnectionTheater::handle_read(const system::error_code& error, size_t byte
 
 		if (!packet.isValid)
 		{
-			game_socket_.async_read_some(buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length), bind(&ConnectionTheater::handle_read, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+			game_socket_.async_read_some(buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length),
+			                             bind(&ConnectionTheater::handle_read, this, asio::placeholders::error,
+			                                  asio::placeholders::bytes_transferred));
 			return;
 		}
 
-		BOOST_LOG_TRIVIAL(debug) << format("[PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << format("[PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.category %
+ packet.type % packet.length % packet.data;
 
 		if (config->hook->connectRetail)
 			retailCtx->sendToRetail(receive_buffer, receive_length);
@@ -67,7 +72,9 @@ void ConnectionTheater::handle_read(const system::error_code& error, size_t byte
 		receive_length = 0;
 		std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
 
-		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), bind(&ConnectionTheater::handle_read, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		                             bind(&ConnectionTheater::handle_read, shared_from_this(),
+		                                  asio::placeholders::error, asio::placeholders::bytes_transferred));
 	}
 }
 
@@ -82,7 +89,8 @@ void ConnectionTheater::sendToGame(unsigned char* data, int length)
 	}
 
 	write(game_socket_, buffer(data, length));
-	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.category % packet.type % packet.length % packet.data;
+	BOOST_LOG_TRIVIAL(debug) << format("[PROXY] -> [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.category %
+ packet.type % packet.length % packet.data;
 }
 
 void ConnectionTheater::handle_stop(bool crash)

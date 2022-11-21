@@ -26,7 +26,9 @@ tcp::socket& HttpHandler::retailSocket()
 
 void HttpHandler::start()
 {
-	http::async_read(game_socket_, buffer_, request_, bind(&HttpHandler::process_request, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+	http::async_read(game_socket_, buffer_, request_, bind(&HttpHandler::process_request, shared_from_this(),
+	                                                       asio::placeholders::error,
+	                                                       asio::placeholders::bytes_transferred));
 }
 
 void HttpHandler::process_request(const system::error_code& error, size_t bytes_transferred)
@@ -46,16 +48,17 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 
 		switch (boostMethod)
 		{
-			case http::verb::get:
-				sdkMethod = methods::GET;
-				break;
-			case http::verb::post:
-				sdkMethod = methods::POST;
-				break;
-			default:
-				BOOST_LOG_TRIVIAL(warning) << "Not implemented method! (" << request_header.method_string() << ") Defaulting to GET...";
-				sdkMethod = methods::GET;
-				break;
+		case http::verb::get:
+			sdkMethod = methods::GET;
+			break;
+		case http::verb::post:
+			sdkMethod = methods::POST;
+			break;
+		default:
+			BOOST_LOG_TRIVIAL(warning) << "Not implemented method! (" << request_header.method_string() <<
+ ") Defaulting to GET...";
+			sdkMethod = methods::GET;
+			break;
 		}
 
 		auto target = request_header.target();
@@ -96,12 +99,13 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 			Concurrency::streams::stringstreambuf response_buffer;
 
 			client.request(sdkMethod)
-				.then([&content_type, &result, &response_buffer](const http_response& response) {
-					utility::string_t ct = response.headers().content_type();
-					content_type = std::string(ct.begin(), ct.end());
-					result = response.status_code();
-					return response.body().read_to_end(response_buffer).get();
-				}).wait();
+			      .then([&content_type, &result, &response_buffer](const http_response& response)
+			      {
+				      utility::string_t ct = response.headers().content_type();
+				      content_type = std::string(ct.begin(), ct.end());
+				      result = response.status_code();
+				      return response.body().read_to_end(response_buffer).get();
+			      }).wait();
 
 			response_.result(result);
 			response_.set(http::field::content_type, content_type);
@@ -109,16 +113,22 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		}
 		catch (std::exception& e)
 		{
-			BOOST_LOG_TRIVIAL(error) << "[HTTP Request Handler]: Failure while doing HTTP request to origin server! (" << e.what() << ")";
+			BOOST_LOG_TRIVIAL(error) << "[HTTP Request Handler]: Failure while doing HTTP request to origin server! ("
+ << e.what() << ")";
 			response_.result(http::status::internal_server_error);
 			response_.set(http::field::content_type, "text/html");
-			ostream(response_.body()) << "<h1>Proxy Error</h1><br/>" << e.what() << "<br/><br/><hr>Battlefield: Bad Company 2 Master Server Emulator by Marek Grzyb (@GrzybDev).\r\n";
+			ostream(response_.body()) << "<h1>Proxy Error</h1><br/>" << e.what() <<
+				"<br/><br/><hr>Battlefield: Bad Company 2 Master Server Emulator by Marek Grzyb (@GrzybDev).\r\n";
 		}
 
 		response_.content_length(response_.body().size());
 
-		http::async_write(game_socket_, response_, bind(&HttpHandler::handle_write, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
-		http::async_read(game_socket_, buffer_, request_, bind(&HttpHandler::process_request, shared_from_this(), asio::placeholders::error, asio::placeholders::bytes_transferred));
+		http::async_write(game_socket_, response_, bind(&HttpHandler::handle_write, shared_from_this(),
+		                                                asio::placeholders::error,
+		                                                asio::placeholders::bytes_transferred));
+		http::async_read(game_socket_, buffer_, request_, bind(&HttpHandler::process_request, shared_from_this(),
+		                                                       asio::placeholders::error,
+		                                                       asio::placeholders::bytes_transferred));
 	}
 }
 

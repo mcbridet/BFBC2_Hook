@@ -4,9 +4,13 @@ class Config
 {
 public:
 	Config();
-	Config(const Config&) {}
 
-	static Config& getInstance() {
+	Config(const Config&)
+	{
+	}
+
+	static Config& getInstance()
+	{
 		static Config* _instance = nullptr;
 
 		if (_instance == nullptr)

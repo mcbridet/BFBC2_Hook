@@ -5,15 +5,19 @@ DWORD WINAPI ProxyInit(LPVOID lpParameter);
 class Proxy
 {
 public:
-    Proxy();
-    Proxy(const Proxy&) {}
+	Proxy();
 
-    static Proxy& getInstance() {
-        static Proxy* _instance = nullptr;
+	Proxy(const Proxy&)
+	{
+	}
 
-        if (_instance == nullptr)
-            _instance = new Proxy();
+	static Proxy& getInstance()
+	{
+		static Proxy* _instance = nullptr;
 
-        return *_instance;
-    }
+		if (_instance == nullptr)
+			_instance = new Proxy();
+
+		return *_instance;
+	}
 };

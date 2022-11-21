@@ -2,7 +2,7 @@
 #include "PatchDNS.hpp"
 
 extern "C" {
-	hostent* (WINAPI __stdcall* OriginalGethostbyname)(const char* hostname) = gethostbyname;
+hostent* (WINAPI __stdcall* OriginalGethostbyname)(const char* hostname) = gethostbyname;
 }
 
 hostent* __stdcall DNSResolve(const char* hostname)
@@ -14,7 +14,6 @@ hostent* __stdcall DNSResolve(const char* hostname)
 
 PatchDNS::PatchDNS()
 {
-	
 }
 
 bool PatchDNS::patchDNSResolution()
@@ -23,7 +22,8 @@ bool PatchDNS::patchDNSResolution()
 	BOOST_LOG_TRIVIAL(info) << "Patching DNS Resolution...";
 
 	const auto winsock2 = GetModuleHandleA("ws2_32.dll");
-	OriginalGethostbyname = reinterpret_cast<hostent * (__stdcall*)(const char*)>(GetProcAddress(winsock2, "gethostbyname"));
+	OriginalGethostbyname = reinterpret_cast<hostent * (__stdcall*)(const char*)>(GetProcAddress(
+		winsock2, "gethostbyname"));
 
 	// Attach detour for gethostbyname
 	DetourTransactionBegin();
@@ -38,7 +38,8 @@ bool PatchDNS::patchDNSResolution()
 		WSACleanup();
 
 		BOOST_LOG_TRIVIAL(error) << "Failed to patch DNS Resolution!";
-		BOOST_LOG_TRIVIAL(error) << "Detour library returned " << commitStatus << " error code while transacting commit.";
+		BOOST_LOG_TRIVIAL(error) << "Detour library returned " << commitStatus <<
+ " error code while transacting commit.";
 		BOOST_LOG_TRIVIAL(error) << "Could not change gethostbyname function from ws2_32.dll to custom hook function.";
 		return FALSE;
 	}

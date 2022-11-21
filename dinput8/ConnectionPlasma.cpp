@@ -11,14 +11,14 @@ using namespace websockets::client;
 
 ConnectionPlasma::ConnectionPlasma(io_service& io_service, ssl::context& context) : game_socket_(io_service, context)
 {
-	retailCtx = new ConnectionRetail(PLASMA, 
-		[=](unsigned char* data, int length) {sendToGame(data, length); },
-		[=]() {handle_stop(); },
-		io_service, context);
+	retailCtx = new ConnectionRetail(PLASMA,
+	                                 [=](unsigned char* data, int length) { sendToGame(data, length); },
+	                                 [=]() { handle_stop(); },
+	                                 io_service, context);
 
 	wsCtx = new ConnectionWebSocket(PLASMA,
-		[=](unsigned char* data, int length) {sendToGame(data, length); },
-		[=]() {handle_stop(false); });
+	                                [=](unsigned char* data, int length) { sendToGame(data, length); },
+	                                [=]() { handle_stop(false); });
 }
 
 socketSSL::lowest_layer_type& ConnectionPlasma::gameSocket()
@@ -29,7 +29,8 @@ socketSSL::lowest_layer_type& ConnectionPlasma::gameSocket()
 void ConnectionPlasma::start()
 {
 	// Before reading stuff we have to do a handshake
-	game_socket_.async_handshake(ssl::stream_base::server, bind(&ConnectionPlasma::handle_handshake, shared_from_this(), placeholders::error));
+	game_socket_.async_handshake(ssl::stream_base::server,
+	                             bind(&ConnectionPlasma::handle_handshake, shared_from_this(), placeholders::error));
 }
 
 void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
@@ -48,13 +49,16 @@ void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 		connected = true;
 
 		std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
-		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), boost::bind(&ConnectionPlasma::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		                             boost::bind(&ConnectionPlasma::handle_read, shared_from_this(),
+		                                         placeholders::error, placeholders::bytes_transferred));
 
 		BOOST_LOG_TRIVIAL(info) << "Client connected";
 	}
 	else
 	{
-		BOOST_LOG_TRIVIAL(info) << "Disconnected, error message: " << error.message() << ", error code: " << error.value();
+		BOOST_LOG_TRIVIAL(info) << "Disconnected, error message: " << error.message() << ", error code: " << error.
+value();
 		handle_stop();
 	}
 }
@@ -71,11 +75,14 @@ void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_
 
 		if (!packet.isValid)
 		{
-			game_socket_.async_read_some(buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length), bind(&ConnectionPlasma::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+			game_socket_.async_read_some(buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length),
+			                             bind(&ConnectionPlasma::handle_read, this, placeholders::error,
+			                                  placeholders::bytes_transferred));
 			return;
 		}
 
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.
+category % packet.type % packet.length % packet.data;
 
 		if (config->hook->connectRetail)
 			retailCtx->sendToRetail(receive_buffer, receive_length);
@@ -85,7 +92,9 @@ void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_
 		receive_length = 0;
 		std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
 
-		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH), boost::bind(&ConnectionPlasma::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		                             boost::bind(&ConnectionPlasma::handle_read, shared_from_this(),
+		                                         placeholders::error, placeholders::bytes_transferred));
 	}
 	else
 	{
@@ -105,7 +114,8 @@ void ConnectionPlasma::sendToGame(unsigned char* data, int length)
 	}
 
 	write(game_socket_, buffer(data, length));
-	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.category % packet.type % packet.length % packet.data;
+	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.category
+ % packet.type % packet.length % packet.data;
 }
 
 

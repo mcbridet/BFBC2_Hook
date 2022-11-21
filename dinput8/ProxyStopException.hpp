@@ -1,9 +1,11 @@
 #pragma once
 #include <iostream>
 
-class ProxyStopException : public std::exception {
+class ProxyStopException : public std::exception
+{
 public:
-	const char* what() {
+	const char* what()
+	{
 		return "Restart Proxy";
 	}
 };
