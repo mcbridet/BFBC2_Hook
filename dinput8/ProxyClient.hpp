@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ProxyUDP.hpp"
 
 class ProxyClient
@@ -16,7 +16,7 @@ public:
         return *_instance;
     }
 
-    boost::asio::ip::tcp::resolver* plasmaResolver;
+    boost::asio::ip::tcp::resolver* tcpResolver;
 
     ProxyUDP* theaterCtx;
     web::websockets::client::websocket_callback_client theater_ws;

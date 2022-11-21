@@ -55,7 +55,7 @@ Proxy::Proxy()
 
 			if (config->hook->connectRetail)
 			{
-				proxyClient->plasmaResolver = new ip::tcp::resolver(io_service);
+				proxyClient->tcpResolver = new ip::tcp::resolver(io_service);
 			}
 
 			BOOST_LOG_TRIVIAL(info) << "Finished initialization, ready for receiving incoming connections!";
