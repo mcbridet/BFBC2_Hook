@@ -35,7 +35,7 @@ void ProxyTCP::start_accept()
 	}
 	else
 	{
-		new_theater_connection.reset(new ConnectionTheater((io_context&)acceptor_.get_executor().context()));
+		new_theater_connection.reset(new ConnectionTheater((io_context&)acceptor_.get_executor().context(), context_));
 		acceptor_.async_accept(new_theater_connection->gameSocket(), boost::bind(&ProxyTCP::handle_accept_theater, this, asio::placeholders::error));
 	}
 }
