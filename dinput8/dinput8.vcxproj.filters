@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -105,6 +105,9 @@
     <ClInclude Include="ProxyStopException.hpp">
       <Filter>Header Files\proxy</Filter>
     </ClInclude>
+    <ClInclude Include="Packet.hpp">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -154,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="HttpHandler.cpp">
       <Filter>Source Files\proxy\http</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Source Files\proxy</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

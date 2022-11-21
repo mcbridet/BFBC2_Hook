@@ -160,6 +160,7 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
     <ClInclude Include="framework.hpp" />
     <ClInclude Include="Hook.hpp" />
     <ClInclude Include="HttpHandler.hpp" />
+    <ClInclude Include="Packet.hpp" />
     <ClInclude Include="PatchDNS.hpp" />
     <ClInclude Include="PatchSSL.hpp" />
     <ClInclude Include="pch.hpp" />
@@ -180,6 +181,7 @@ copy /Y "$(SolutionDir)third_party\zlib\bin\zlib.dll" "$(TargetDir)zlib.dll"</Co
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Hook.cpp" />
     <ClCompile Include="HttpHandler.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PatchDNS.cpp" />
     <ClCompile Include="PatchSSL.cpp" />
     <ClCompile Include="pch.cpp">
