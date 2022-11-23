@@ -26,14 +26,12 @@ ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsi
 		});
 
 	Config* config = &Config::getInstance();
-	Hook* hook = &Hook::getInstance();
 
 	wsPath = config->hook->serverSecure ? L"wss://" : L"ws://";
 	wsPath += std::wstring(config->hook->serverAddress.begin(), config->hook->serverAddress.end());
 	wsPath += L":";
 	wsPath += std::to_wstring(config->hook->serverPort);
-	wsPath += type == PLASMA ? L"/plasma/" : L"/theater/";
-	wsPath += (hook->exeType == CLIENT) ? L"client" : L"server";
+	wsPath += type == PLASMA ? L"/plasma" : L"/theater";
 }
 
 void ConnectionWebSocket::connect()
@@ -80,8 +78,7 @@ void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
 		msg.set_binary_message(is);
 
 		ws.send(msg).wait();
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") %
- std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.service % packet.kind % packet.length % packet.data;
 	}
 	catch (const websocket_exception& ex)
 	{
@@ -137,7 +134,7 @@ void ConnectionWebSocket::handle_binary_message(Concurrency::streams::istream bi
 		return;
 	}
 
-	if (packet.category == "ECHO")
+	if (packet.service == "ECHO")
 	{
 		ProxyClient* pClient = &ProxyClient::getInstance();
 
@@ -152,14 +149,12 @@ void ConnectionWebSocket::handle_binary_message(Concurrency::streams::istream bi
 			            boost::asio::placeholders::bytes_transferred)
 		);
 
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] [PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") %
- std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] [PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.service % packet.kind % packet.length % packet.data;
 	}
 	else
 	{
 		sendToGame(send_buffer, length);
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") %
- std::string(wsPath.begin(), wsPath.end()) % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.service % packet.kind % packet.length % packet.data;
 	}
 }
 

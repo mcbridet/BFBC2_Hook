@@ -55,8 +55,7 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 			sdkMethod = methods::POST;
 			break;
 		default:
-			BOOST_LOG_TRIVIAL(warning) << "Not implemented method! (" << request_header.method_string() <<
- ") Defaulting to GET...";
+			BOOST_LOG_TRIVIAL(warning) << "Not implemented method! (" << request_header.method_string() << ") Defaulting to GET...";
 			sdkMethod = methods::GET;
 			break;
 		}
@@ -64,10 +63,9 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		auto target = request_header.target();
 		logTarget = target.to_string();
 
-		if (!config->hook->connectRetail && host.starts_with("easo.ea.com"))
+		if (!config->hook->connectRetail)
 		{
-			// Easo contains static xml files, add /static to path
-			target = "/static" + target.to_string();
+			target = "/easo" + target.to_string();
 		}
 
 		std::wstring httpFinalPath;
@@ -113,8 +111,7 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		}
 		catch (std::exception& e)
 		{
-			BOOST_LOG_TRIVIAL(error) << "[HTTP Request Handler]: Failure while doing HTTP request to origin server! ("
- << e.what() << ")";
+			BOOST_LOG_TRIVIAL(error) << "[HTTP Request Handler]: Failure while doing HTTP request to origin server! (" << e.what() << ")";
 			response_.result(http::status::internal_server_error);
 			response_.set(http::field::content_type, "text/html");
 			ostream(response_.body()) << "<h1>Proxy Error</h1><br/>" << e.what() <<

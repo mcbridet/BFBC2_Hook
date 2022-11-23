@@ -6,14 +6,14 @@ Packet::Packet(unsigned char* data, unsigned int data_length)
 	if (data_length < HEADER_LENGTH || data_length > PACKET_MAX_LENGTH)
 		return;
 
-	// Packet category (fsys, acct, etc...)
-	char category_raw[HEADER_VALUE_LENGTH + 1];
-	memcpy(category_raw, data, HEADER_VALUE_LENGTH);
-	category_raw[HEADER_VALUE_LENGTH] = 0;
-	category = category_raw;
+	// Service that should handle this packet (fsys, acct, etc...)
+	char service_raw[HEADER_VALUE_LENGTH + 1];
+	memcpy(service_raw, data, HEADER_VALUE_LENGTH);
+	service_raw[HEADER_VALUE_LENGTH] = 0;
+	service = service_raw;
 
-	// Packet type (NORMAL, SPLITTED, etc...)
-	type = Utils::DecodeInt(data + TYPE_OFFSET, HEADER_VALUE_LENGTH);
+	// Transaction kind (Simple, Chunked, etc...)
+	kind = Utils::DecodeInt(data + TYPE_OFFSET, HEADER_VALUE_LENGTH);
 	length = Utils::DecodeInt(data + LENGTH_OFFSET, HEADER_VALUE_LENGTH);
 
 	if (length != data_length)
@@ -34,8 +34,7 @@ Packet::Packet(unsigned char* data, unsigned int data_length)
 
 		if (isIncomplete)
 		{
-			BOOST_LOG_TRIVIAL(error) << "Invalid data length! (Expected: " << expected_data_length << ", Got: " <<
- received_data_length << ")";
+			BOOST_LOG_TRIVIAL(error) << "Invalid data length! (Expected: " << expected_data_length << ", Got: " << received_data_length << ")";
 			return;
 		}
 	}

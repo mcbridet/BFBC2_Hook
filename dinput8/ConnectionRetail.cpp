@@ -99,8 +99,7 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 				return;
 			}
 
-			BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port)
- % packet.category % packet.type % packet.length % packet.data;
+			BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) % packet.service % packet.kind % packet.length % packet.data;
 			sendToGame(receive_buffer, receive_length);
 		}
 		else
@@ -151,8 +150,7 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 
 				current_offset += length;
 
-				BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" +
-					port) % packet->category % packet->type % packet->length % packet->data;
+				BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) % packet->service % packet->kind % packet->length % packet->data;
 				sendToGame(receive_buffer + current_offset - length, length);
 			}
 		}
@@ -191,8 +189,7 @@ void ConnectionRetail::sendToRetail(unsigned char* data, unsigned int length)
 	else
 		write(retail_socket_, buffer(data, length));
 
-	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) %
- packet.category % packet.type % packet.length % packet.data;
+	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % (host + ":" + port) % packet.service % packet.kind % packet.length % packet.data;
 }
 
 void ConnectionRetail::close()

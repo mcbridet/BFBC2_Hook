@@ -81,8 +81,7 @@ void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_
 			return;
 		}
 
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.
-category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
 
 		if (config->hook->connectRetail)
 			retailCtx->sendToRetail(receive_buffer, receive_length);
@@ -114,8 +113,7 @@ void ConnectionPlasma::sendToGame(unsigned char* data, int length)
 	}
 
 	write(game_socket_, buffer(data, length));
-	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.category
- % packet.type % packet.length % packet.data;
+	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
 }
 
 

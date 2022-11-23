@@ -35,8 +35,7 @@ void ProxyUDP::handle_receive(const system::error_code& error, size_t bytes_tran
 		unsigned int packet_length = Utils::DecodeInt(received_data + 8, 4);
 
 		Packet packet(received_data, packet_length);
-		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.
-category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
 
 		ProxyClient* pClient = &ProxyClient::getInstance();
 		pClient->theaterCtx = this;
@@ -76,8 +75,7 @@ category % packet.type % packet.length % packet.data;
 			}
 		}
 
-		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % remote_endpoint_.
-address().to_string() % packet.category % packet.type % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << format("[UDP] [PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % remote_endpoint_.address().to_string() % packet.service % packet.kind % packet.length % packet.data;
 		start_receive();
 	}
 }
