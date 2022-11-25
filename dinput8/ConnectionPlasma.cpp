@@ -2,7 +2,6 @@
 #include "ConnectionPlasma.hpp"
 
 #include "Config.hpp"
-#include "Hook.hpp"
 
 using namespace boost::asio;
 using namespace ip;
@@ -20,6 +19,13 @@ ConnectionPlasma::ConnectionPlasma(io_service& io_service, ssl::context& context
 	                                [=](unsigned char* data, int length) { sendToGame(data, length); },
 	                                [=]() { handle_stop(false); });
 }
+
+ConnectionPlasma::~ConnectionPlasma()
+{
+	delete retailCtx;
+	delete wsCtx;
+}
+
 
 socketSSL::lowest_layer_type& ConnectionPlasma::gameSocket()
 {

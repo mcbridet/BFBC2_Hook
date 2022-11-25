@@ -8,6 +8,8 @@ class ConnectionPlasma : public boost::enable_shared_from_this<ConnectionPlasma>
 {
 public:
 	ConnectionPlasma(boost::asio::io_service& io_service, boost::asio::ssl::context& context);
+	~ConnectionPlasma();
+
 	using pointer = boost::shared_ptr<ConnectionPlasma>;
 
 	socketSSL::lowest_layer_type& gameSocket();
