@@ -18,7 +18,7 @@ void Config::readConfig() const
 	{
 		read_json(configPath, pt);
 	}
-	catch (boost::property_tree::json_parser_error e)
+	catch (boost::property_tree::json_parser_error& e)
 	{
 		// Will use defaults in case of parse error
 
