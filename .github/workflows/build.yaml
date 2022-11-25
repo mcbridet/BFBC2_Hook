@@ -84,6 +84,8 @@ jobs:
           pushd ..\..\third_party\zlib\lib
           set ZLIB_FILE_PATH=%CD%\zlib.lib
           popd
+          del C:\Strawberry\c\lib\libcrypto.a
+          del C:\Strawberry\c\lib\libssl.a
           cmake -A Win32 -DBOOST_ROOT=..\..\third_party\boost\ -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_INCLUDE_DIR=..\..\third_party\openssl_new\include -DOPENSSL_LIBRARIES=..\..\third_party\openssl_new\lib -DZLIB_LIBRARY=%ZLIB_FILE_PATH% -DZLIB_INCLUDE_DIR=..\..\third_party\zlib\include -DCMAKE_INSTALL_PREFIX=..\..\third_party\cpprestsdk .
           msbuild INSTALL.vcxproj /p:Configuration=Release /p:Platform=Win32
       
