@@ -118,7 +118,7 @@ void ConnectionPlasma::sendToGame(unsigned char* data, int length)
 		return;
 	}
 
-	write(game_socket_, buffer(data, packet.length));
+	write(game_socket_, buffer(data, length));
 	BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [GAME (Plasma)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
 }
 
