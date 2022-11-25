@@ -20,6 +20,12 @@ ConnectionTheater::ConnectionTheater(io_service& io_service, ssl::context& conte
 	                                [=]() { handle_stop(false); });
 }
 
+ConnectionTheater::~ConnectionTheater()
+{
+	delete retailCtx;
+	delete wsCtx;
+}
+
 tcp::socket& ConnectionTheater::gameSocket()
 {
 	return game_socket_;

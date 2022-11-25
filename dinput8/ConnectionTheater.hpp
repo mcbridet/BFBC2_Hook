@@ -6,6 +6,7 @@ class ConnectionTheater : public boost::enable_shared_from_this<ConnectionTheate
 {
 public:
 	ConnectionTheater(boost::asio::io_service& io_service, boost::asio::ssl::context& context);
+	~ConnectionTheater();
 
 	using pointer = boost::shared_ptr<ConnectionTheater>;
 
