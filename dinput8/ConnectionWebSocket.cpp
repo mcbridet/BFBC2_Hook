@@ -105,13 +105,13 @@ void ConnectionWebSocket::handle_receive(websocket_incoming_message msg)
 	{
 		switch (msg.message_type())
 		{
-		case websocket_message_type::text_message:
-			return handle_text_message(msg.extract_string().get());
-		case websocket_message_type::binary_message:
-			return handle_binary_message(msg.body());
-		case websocket_message_type::ping:
-			return handle_ping(msg.body());
-		default: break;
+			case websocket_message_type::text_message:
+				return handle_text_message(msg.extract_string().get());
+			case websocket_message_type::binary_message:
+				return handle_binary_message(msg.body());
+			case websocket_message_type::ping:
+				return handle_ping(msg.body());
+			default: break;
 		}
 	}
 	catch (const websocket_exception& ex)
@@ -199,7 +199,15 @@ void ConnectionWebSocket::handle_disconnect(websocket_close_status close_status,
 	BOOST_LOG_NAMED_SCOPE("WebSocket (Disconnect)")
 	BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << static_cast<int>(close_status) << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
 	connected = false;
-	closeCallback();
+
+	try
+	{
+		closeCallback();
+	}
+	catch (std::exception &e)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Error while handling disconnect: " << e.what();
+	}
 }
 
 void ConnectionWebSocket::close()
