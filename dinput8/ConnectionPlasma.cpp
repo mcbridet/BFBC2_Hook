@@ -10,6 +10,8 @@ using namespace websockets::client;
 
 ConnectionPlasma::ConnectionPlasma(io_service& io_service, ssl::context& context) : game_socket_(io_service, context)
 {
+	BOOST_LOG_FUNCTION();
+
 	retailCtx = new ConnectionRetail(PLASMA,
 	                                 [=](unsigned char* data, int length) { sendToGame(data, length); },
 	                                 [=]() { handle_stop(); },
@@ -41,6 +43,8 @@ void ConnectionPlasma::start()
 
 void ConnectionPlasma::handle_handshake(const boost::system::error_code& error)
 {
+	BOOST_LOG_NAMED_SCOPE("Plasma (Handshake)")
+
 	Config* config = &Config::getInstance();
 
 	if (!error)
@@ -71,6 +75,8 @@ value();
 
 void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
+	BOOST_LOG_NAMED_SCOPE("Plasma (Read)")
+
 	Config* config = &Config::getInstance();
 
 	if (!error)
@@ -110,6 +116,8 @@ void ConnectionPlasma::handle_read(const boost::system::error_code& error, size_
 
 void ConnectionPlasma::sendToGame(unsigned char* data, int length)
 {
+	BOOST_LOG_NAMED_SCOPE("Plasma (Write)")
+
 	Packet packet(data, length);
 
 	if (!packet.isValid)
@@ -125,6 +133,8 @@ void ConnectionPlasma::sendToGame(unsigned char* data, int length)
 
 void ConnectionPlasma::handle_stop(bool crash)
 {
+	BOOST_LOG_NAMED_SCOPE("Plasma (Stop)")
+
 	if (wsCtx->connected)
 		wsCtx->close();
 

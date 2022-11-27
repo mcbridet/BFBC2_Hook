@@ -11,6 +11,7 @@ using namespace websockets::client;
 ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsigned char*, unsigned)> sendToGame,
                                          std::function<void()> closeCallback)
 {
+	BOOST_LOG_FUNCTION()
 	this->type = type;
 
 	this->sendToGame = sendToGame;
@@ -36,6 +37,8 @@ ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsi
 
 void ConnectionWebSocket::connect()
 {
+	BOOST_LOG_NAMED_SCOPE("WebSocket (Connect)")
+
 	try
 	{
 		BOOST_LOG_TRIVIAL(warning) << "Connecting to WebSocket server (" << wsPath << ")...";
@@ -56,6 +59,8 @@ void ConnectionWebSocket::connect()
 
 void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
 {
+	BOOST_LOG_NAMED_SCOPE("WebSocket (Write)")
+
 	try
 	{
 		Packet packet(data, length);
@@ -89,6 +94,8 @@ void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
 
 void ConnectionWebSocket::handle_receive(websocket_incoming_message msg)
 {
+	BOOST_LOG_NAMED_SCOPE("WebSocket (Read)")
+
 	try
 	{
 		switch (msg.message_type())
@@ -184,9 +191,8 @@ void ConnectionWebSocket::handle_ping(Concurrency::streams::istream ping)
 void ConnectionWebSocket::handle_disconnect(websocket_close_status close_status, const utility::string_t& reason,
                                             const std::error_code& error)
 {
-	BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << static_cast<int>(close_status) <<
- ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str()
- << "))";
+	BOOST_LOG_NAMED_SCOPE("WebSocket (Disconnect)")
+	BOOST_LOG_TRIVIAL(info) << "Disconnected from server! (Close Status: " << static_cast<int>(close_status) << ", Reason: " << reason.c_str() << " - (Error Code: " << error.value() << ", Error Message: " << error.message().c_str() << "))";
 	connected = false;
 	closeCallback();
 }

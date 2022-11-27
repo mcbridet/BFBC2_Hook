@@ -13,6 +13,8 @@ ConnectionRetail::ConnectionRetail(ProxyType type, std::function<void(unsigned c
                                    std::function<void()> closeCallback, io_service& io_service, ssl::context& context) :
 	retail_socket_ssl_(io_service, context), retail_socket_(io_service)
 {
+	BOOST_LOG_FUNCTION();
+
 	this->type = type;
 
 	this->sendToGame = sendToGame;
@@ -45,6 +47,7 @@ tcp::socket& ConnectionRetail::retailSocket()
 
 void ConnectionRetail::connectToRetail()
 {
+	BOOST_LOG_NAMED_SCOPE("Retail (Connect)")
 	BOOST_LOG_TRIVIAL(warning) << "Connecting to retail server (" << host << ":" << port << ")...";
 
 	ProxyClient* proxyClient = &ProxyClient::getInstance();
@@ -81,6 +84,7 @@ void ConnectionRetail::connectToRetail()
 void ConnectionRetail::handle_read(const boost::system::error_code& error, size_t bytes_transferred)
 {
 	// Retail server sent something, send it to the game (client)
+	BOOST_LOG_NAMED_SCOPE("Retail (Read)")
 
 	if (!error && connected)
 	{
@@ -176,6 +180,8 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 
 void ConnectionRetail::sendToRetail(unsigned char* data, unsigned int length)
 {
+	BOOST_LOG_NAMED_SCOPE("Retail (Write)")
+
 	Packet packet(data, length);
 
 	if (!packet.isValid)
