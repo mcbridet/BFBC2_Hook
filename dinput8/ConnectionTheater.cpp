@@ -95,8 +95,15 @@ void ConnectionTheater::sendToGame(unsigned char* data, int length)
 		return;
 	}
 
-	write(game_socket_, buffer(data, length));
-	BOOST_LOG_TRIVIAL(debug) << format("[PROXY] -> [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
+	try
+	{
+		write(game_socket_, buffer(data, length));
+		BOOST_LOG_TRIVIAL(debug) << format("[PROXY] -> [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
+	}
+	catch (std::exception &e)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "[Theater] write() failed: " << e.what();
+	}
 }
 
 void ConnectionTheater::handle_stop(bool crash)
