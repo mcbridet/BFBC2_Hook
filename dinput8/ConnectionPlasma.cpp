@@ -14,7 +14,7 @@ ConnectionPlasma::ConnectionPlasma(io_service& io_service, ssl::context& context
 
 	retailCtx = new ConnectionRetail(PLASMA,
 	                                 [=](unsigned char* data, int length) { sendToGame(data, length); },
-	                                 [=]() { handle_stop(); },
+	                                 [=]() { handle_stop(false); },
 	                                 io_service, context);
 
 	wsCtx = new ConnectionWebSocket(PLASMA,
