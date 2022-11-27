@@ -63,11 +63,6 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 		auto target = request_header.target();
 		logTarget = target.to_string();
 
-		if (!config->hook->connectRetail)
-		{
-			target = "/easo" + target.to_string();
-		}
-
 		std::wstring httpFinalPath;
 
 		if (config->hook->connectRetail)
