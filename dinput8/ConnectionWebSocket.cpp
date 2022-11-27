@@ -35,6 +35,11 @@ ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsi
 	wsPath += type == PLASMA ? L"/plasma" : L"/theater";
 }
 
+ConnectionWebSocket::~ConnectionWebSocket()
+{
+	close();
+}
+
 void ConnectionWebSocket::connect()
 {
 	BOOST_LOG_NAMED_SCOPE("WebSocket (Connect)")

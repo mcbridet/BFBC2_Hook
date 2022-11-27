@@ -10,6 +10,7 @@ public:
 	ConnectionRetail(ProxyType type, std::function<void(unsigned char*, unsigned int)> sendToGame,
 	                 std::function<void()> closeCallback, boost::asio::io_service& io_service,
 	                 boost::asio::ssl::context& context);
+	~ConnectionRetail();
 
 	socketSSL::lowest_layer_type& retailSocketSSL();
 	boost::asio::ip::tcp::socket& retailSocket();

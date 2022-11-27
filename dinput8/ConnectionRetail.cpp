@@ -34,6 +34,12 @@ ConnectionRetail::ConnectionRetail(ProxyType type, std::function<void(unsigned c
 	}
 }
 
+ConnectionRetail::~ConnectionRetail()
+{
+	close();
+}
+
+
 socketSSL::lowest_layer_type& ConnectionRetail::retailSocketSSL()
 {
 	return retail_socket_ssl_.lowest_layer();

@@ -5,6 +5,7 @@ class ConnectionWebSocket
 public:
 	ConnectionWebSocket(ProxyType type, std::function<void(unsigned char*, unsigned int)> sendToGame,
 	                    std::function<void()> closeCallback);
+	~ConnectionWebSocket();
 
 	void connect();
 	void send(unsigned char* data, unsigned int length);
