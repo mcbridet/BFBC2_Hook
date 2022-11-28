@@ -28,7 +28,7 @@ private:
 	socketSSL retail_socket_ssl_;
 	boost::asio::ip::tcp::socket retail_socket_;
 
-	unsigned char receive_buffer[PACKET_MAX_LENGTH];
+	unsigned char* receive_buffer;
 	unsigned int receive_length;
 
 	std::function<void(unsigned char*, unsigned int)> sendToGame;

@@ -63,11 +63,15 @@ void ConnectionRetail::connectToRetail()
 
 	if (type == PLASMA)
 	{
+		receive_buffer = new unsigned char[PACKET_MAX_LENGTH];
+
 		connect(retailSocketSSL(), iterator);
 		retail_socket_ssl_.handshake(ssl::stream_base::client);
 	}
 	else
 	{
+		receive_buffer = new unsigned char[USHRT_MAX];
+
 		connect(retailSocket(), iterator);
 	}
 
@@ -81,7 +85,7 @@ void ConnectionRetail::connectToRetail()
 		                                   bind(&ConnectionRetail::handle_read, this, placeholders::error,
 		                                        placeholders::bytes_transferred));
 	else
-		retail_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		retail_socket_.async_read_some(buffer(receive_buffer, USHRT_MAX),
 		                               bind(&ConnectionRetail::handle_read, this, placeholders::error,
 		                                    placeholders::bytes_transferred));
 }
@@ -99,13 +103,22 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 		if (type == PLASMA)
 		{
 			// Plasma packets are pretty much guaranteed to be "valid" (a.k.a we only receive one message per packet)
-			const Packet packet(receive_buffer, receive_length);
 
-			if (!packet.isValid)
+			// For some reason, retail server sends only one (first) byte in first packet, and the rest of the packet in second packet
+			// No idea why, but before processing check if first packet is "long" enough
+
+			if (receive_length < HEADER_LENGTH)
 			{
 				retail_socket_ssl_.async_read_some(
 					buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length),
 					bind(&ConnectionRetail::handle_read, this, placeholders::error, placeholders::bytes_transferred));
+				return;
+			}
+
+			const Packet packet(receive_buffer, receive_length);
+
+			if (!packet.isValid)
+			{
 				return;
 			}
 
@@ -123,35 +136,24 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 			{
 				unsigned int length = length = Utils::DecodeInt(receive_buffer + current_offset + LENGTH_OFFSET,
 				                                                HEADER_VALUE_LENGTH);
+
+				if (length == 0)
+					break;
+
+
 				auto packet = new Packet(receive_buffer + current_offset, length);
 
 				if (!packet->isValid)
 				{
-					// Invalid packet, check if packet is *just* incomplete (so we should more data)
+					// Invalid packet, check if packet is *just* incomplete (so we should wait for more data)
 
 					if (packet->isIncomplete)
 					{
-						unsigned char incomplete_packet[PACKET_MAX_LENGTH];
+						BOOST_LOG_TRIVIAL(debug) << "Incomplete packet, receiving next chunk...";
+						retail_socket_.read_some(buffer(receive_buffer + current_offset + packet->realLength, USHRT_MAX - current_offset - packet->realLength));
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // It just... makes this thing work?
 
-						std::fill_n(incomplete_packet, PACKET_MAX_LENGTH, 0);
-						memcpy(incomplete_packet, receive_buffer + current_offset, PACKET_MAX_LENGTH - current_offset);
-						std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
-						memcpy(receive_buffer, incomplete_packet, PACKET_MAX_LENGTH);
-
-						unsigned int part_end_offset = HEADER_LENGTH;
-
-						for (; part_end_offset < PACKET_MAX_LENGTH; part_end_offset++)
-						{
-							if (receive_buffer[part_end_offset] == 0)
-								break;
-						}
-
-						receive_length = 0;
-						retail_socket_.async_read_some(
-							buffer(receive_buffer + part_end_offset, PACKET_MAX_LENGTH - part_end_offset),
-							bind(&ConnectionRetail::handle_read, this, placeholders::error,
-							     placeholders::bytes_transferred));
-						return;
+						continue;
 					}
 
 					// Invalid packet
@@ -166,16 +168,23 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 		}
 
 		receive_length = 0;
-		std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
 
 		if (type == PLASMA)
+		{
+			std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
+
 			retail_socket_ssl_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
-			                                   bind(&ConnectionRetail::handle_read, this, placeholders::error,
-			                                        placeholders::bytes_transferred));
+				bind(&ConnectionRetail::handle_read, this, placeholders::error,
+					placeholders::bytes_transferred));
+		}
 		else
-			retail_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
-			                               bind(&ConnectionRetail::handle_read, this, placeholders::error,
-			                                    placeholders::bytes_transferred));
+		{
+			std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
+
+			retail_socket_.async_read_some(buffer(receive_buffer, USHRT_MAX),
+				bind(&ConnectionRetail::handle_read, this, placeholders::error,
+					placeholders::bytes_transferred));
+		}
 	}
 	else
 	{
