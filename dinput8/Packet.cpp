@@ -4,7 +4,10 @@
 Packet::Packet(unsigned char* data, unsigned int data_length)
 {
 	if (data_length < HEADER_LENGTH || data_length > PACKET_MAX_LENGTH)
+	{
+		BOOST_LOG_TRIVIAL(error) << "Invalid packet length! (Expected data length in range " << HEADER_LENGTH << "-" << PACKET_MAX_LENGTH << " (bytes), Got: " << data_length << ")";
 		return;
+	}
 
 	// Service that should handle this packet (fsys, acct, etc...)
 	char service_raw[HEADER_VALUE_LENGTH + 1];
