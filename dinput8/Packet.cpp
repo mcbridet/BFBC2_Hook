@@ -34,6 +34,7 @@ Packet::Packet(unsigned char* data, unsigned int data_length)
 
 		if (isIncomplete)
 		{
+			realLength = received_data_length + HEADER_LENGTH;
 			BOOST_LOG_TRIVIAL(error) << "Invalid data length! (Expected: " << expected_data_length << ", Got: " << received_data_length << ")";
 			return;
 		}
