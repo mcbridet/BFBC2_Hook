@@ -35,8 +35,8 @@ tcp::socket& ConnectionTheater::gameSocket()
 
 void ConnectionTheater::start()
 {
-	std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
-	game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+	std::fill_n(receive_buffer, USHRT_MAX, 0);
+	game_socket_.async_read_some(buffer(receive_buffer, USHRT_MAX),
 	                             bind(&ConnectionTheater::handle_read, shared_from_this(), asio::placeholders::error,
 	                                  asio::placeholders::bytes_transferred));
 }
@@ -59,27 +59,48 @@ void ConnectionTheater::handle_read(const system::error_code& error, size_t byte
 			connected = true;
 		}
 
-		const Packet packet(receive_buffer, receive_length);
+		unsigned int current_offset = 0;
 
-		if (!packet.isValid)
+		while (true)
 		{
-			game_socket_.async_read_some(buffer(receive_buffer + receive_length, PACKET_MAX_LENGTH - receive_length),
-			                             bind(&ConnectionTheater::handle_read, this, asio::placeholders::error,
-			                                  asio::placeholders::bytes_transferred));
-			return;
+			unsigned int length = length = Utils::DecodeInt(receive_buffer + current_offset + LENGTH_OFFSET,
+				HEADER_VALUE_LENGTH);
+
+			if (length == 0)
+				break;
+
+			auto packet = new Packet(receive_buffer + current_offset, length);
+
+			if (!packet->isValid)
+			{
+				// Invalid packet, check if packet is *just* incomplete (so we should wait for more data)
+
+				if (packet->isIncomplete)
+				{
+					BOOST_LOG_TRIVIAL(debug) << "Incomplete packet, receiving next chunk...";
+					game_socket_.read_some(buffer(receive_buffer + current_offset + packet->realLength, USHRT_MAX - current_offset - packet->realLength));
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // It just... makes this thing work?
+
+					continue;
+				}
+
+				// Invalid packet
+				break;
+			}
+
+			current_offset += length;
+			BOOST_LOG_TRIVIAL(debug) << format("[PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet->service % packet->kind % packet->length % packet->data;
+
+			if (config->hook->connectRetail)
+				retailCtx->sendToRetail(receive_buffer + current_offset - length, length);
+			else
+				wsCtx->send(receive_buffer + current_offset - length, length);
 		}
 
-		BOOST_LOG_TRIVIAL(debug) << format("[PROXY] <- [GAME (Theater)] %s 0x%08x (%i bytes) {%s}") % packet.service % packet.kind % packet.length % packet.data;
-
-		if (config->hook->connectRetail)
-			retailCtx->sendToRetail(receive_buffer, receive_length);
-		else
-			wsCtx->send(receive_buffer, receive_length);
-
 		receive_length = 0;
-		std::fill_n(receive_buffer, PACKET_MAX_LENGTH, 0);
+		std::fill_n(receive_buffer, USHRT_MAX, 0);
 
-		game_socket_.async_read_some(buffer(receive_buffer, PACKET_MAX_LENGTH),
+		game_socket_.async_read_some(buffer(receive_buffer, USHRT_MAX),
 		                             bind(&ConnectionTheater::handle_read, shared_from_this(),
 		                                  asio::placeholders::error, asio::placeholders::bytes_transferred));
 	}

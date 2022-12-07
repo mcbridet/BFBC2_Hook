@@ -20,7 +20,7 @@ private:
 
 	boost::asio::ip::tcp::socket game_socket_;
 
-	unsigned char receive_buffer[PACKET_MAX_LENGTH];
+	unsigned char receive_buffer[USHRT_MAX];
 	unsigned int receive_length;
 
 	bool connected = false;
