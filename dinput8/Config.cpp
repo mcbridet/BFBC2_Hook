@@ -39,6 +39,13 @@ void Config::readConfig() const
 
 void Config::parseConfig(boost::property_tree::ptree pt) const
 {
+	// Section - Client
+	hook->forceClientType = pt.get("client.forceClientType", "");
+	hook->clientPlasmaPort = pt.get("client.clientPlasmaPort", CLIENT_PLASMA_PORT);
+	hook->clientTheaterPort = pt.get("client.clientTheaterPort", CLIENT_THEATER_PORT);
+	hook->serverPlasmaPort = pt.get("client.serverPlasmaPort", SERVER_PLASMA_PORT);
+	hook->serverTheaterPort = pt.get("client.serverTheaterPort", SERVER_THEATER_PORT);
+
 	// Section - Debug
 	hook->showConsole = pt.get("debug.showConsole", true);
 	hook->createLog = pt.get("debug.createLog", false);

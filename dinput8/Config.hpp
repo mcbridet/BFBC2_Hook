@@ -21,6 +21,13 @@ public:
 
 	struct HookConfig
 	{
+		/* Client */
+		std::string forceClientType;
+		USHORT clientPlasmaPort;
+		USHORT serverPlasmaPort;
+		USHORT clientTheaterPort;
+		USHORT serverTheaterPort;
+
 		/* Debug */
 		bool showConsole; // Show debug console
 		bool createLog; // Create a log file
