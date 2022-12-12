@@ -158,21 +158,47 @@ void Hook::VerifyGameVersion()
 
 	std::string exeType;
 
-	if (mClientVersionAddr != NULL)
+	if (config->hook->forceClientType != "")
 	{
-		exeType = "Client";
-		this->exeType = CLIENT;
-	}
-	else if (mServerVersionAddr != NULL)
-	{
-		exeType = "Server";
-		this->exeType = SERVER;
+		std::string clientType = boost::algorithm::to_upper_copy(config->hook->forceClientType);
+		if (clientType == "CLIENT")
+		{
+			exeType = "Client";
+			this->exeType = CLIENT;
+		}
+		else if (clientType == "SERVER")
+		{
+			exeType = "Server";
+			this->exeType = SERVER;
+		}
+		else
+		{
+			exeType = "!!!!!! UNKNOWN !!!!!!";
+			this->exeType = UNKNOWN;
+		}
+
+		BOOST_LOG_TRIVIAL(info) << "Forced executable type: " << exeType;
 	}
 	else
 	{
-		exeType = "!!!!!! UNKNOWN !!!!!!";
-		this->exeType = UNKNOWN;
-	}
+		std::string exeType;
 
-	BOOST_LOG_TRIVIAL(info) << "Detected executable type: " << exeType;
+		if (mClientVersionAddr != NULL)
+		{
+			exeType = "Client";
+			this->exeType = CLIENT;
+		}
+		else if (mServerVersionAddr != NULL)
+		{
+			exeType = "Server";
+			this->exeType = SERVER;
+		}
+		else
+		{
+			exeType = "!!!!!! UNKNOWN !!!!!!";
+			this->exeType = UNKNOWN;
+		}
+
+		BOOST_LOG_TRIVIAL(info) << "Detected executable type: " << exeType;
+	}
 }
