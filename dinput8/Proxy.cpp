@@ -34,13 +34,13 @@ Proxy::Proxy()
 
 			if (hook->exeType == CLIENT)
 			{
-				plasmaPort = CLIENT_PLASMA_PORT;
-				theaterPort = CLIENT_THEATER_PORT;
+				plasmaPort = config->hook->clientPlasmaPort;
+				theaterPort = config->hook->clientTheaterPort;
 			}
 			else if (hook->exeType == SERVER)
 			{
-				plasmaPort = SERVER_PLASMA_PORT;
-				theaterPort = SERVER_THEATER_PORT;
+				plasmaPort = config->hook->serverPlasmaPort;
+				theaterPort = config->hook->serverTheaterPort;
 			}
 			else
 				return;
