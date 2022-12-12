@@ -69,6 +69,11 @@ You can change the default behavior of the hook by creating JSON config named `g
 
 | Key                       | Description                                                                      | Allowed Values                 | Default Value                     |
 |---------------------------|----------------------------------------------------------------------------------|--------------------------------|-----------------------------------|
+| client.forceClientType    | Force specific client type                                                       | String ("Client" or "Server")  |                                   |
+| client.clientPlasmaPort   | Plasma port for clients (proxy will listen on that port)                         | Unsigned short (Range 0-65535) | 18390                             |
+| client.clientTheaterPort  | Theater port for clients (proxy will listen on that port)                        | Unsigned short (Range 0-65535) | 18395                             |
+| client.serverPlasmaPort   | Plasma port for servers (proxy will listen on that port)                         | Unsigned short (Range 0-65535) | 18321                             |
+| client.serverTheaterPort  | Theater port for servers (proxy will listen on that port)                        | Unsigned short (Range 0-65535) | 18326                             |
 | debug.showConsole         | Shows hook debug console                                                         | Boolean (true/false)           | true                              |
 | debug.createLog           | Create hook log file                                                             | Boolean (true/false)           | false                             |
 | debug.logPath             | Path to where save log file                                                      | Any string                     | bfbc2_(current date and time).log |
