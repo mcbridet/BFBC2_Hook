@@ -14,6 +14,7 @@
 #include <Unknwn.h>
 #include <tchar.h>
 #include <iostream>
+#include <codecvt>
 
 // Boost
 #include <boost/property_tree/ptree.hpp>

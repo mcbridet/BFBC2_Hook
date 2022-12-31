@@ -95,7 +95,11 @@ void HttpHandler::process_request(const system::error_code& error, size_t bytes_
 			      .then([&content_type, &result, &response_buffer](const http_response& response)
 			      {
 				      utility::string_t ct = response.headers().content_type();
-				      content_type = std::string(ct.begin(), ct.end());
+
+					  using convert_type = std::codecvt_utf8<wchar_t>;
+					  std::wstring_convert<convert_type, wchar_t> converter;
+
+				      content_type = converter.to_bytes(ct);
 				      result = response.status_code();
 				      return response.body().read_to_end(response_buffer).get();
 			      }).wait();
