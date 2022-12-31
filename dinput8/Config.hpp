@@ -47,6 +47,10 @@ public:
 		std::string serverAddress; // Server Address (e.g bfbc2.grzyb.dev)
 		USHORT serverPort; // Server Port (e.g. 443)
 		bool serverSecure; // If true - use WSS, else - use WS
+
+		/* Overrides */
+		std::string clientVersion;
+		std::string serverVersion;
 	};
 
 	HookConfig* hook = new HookConfig();

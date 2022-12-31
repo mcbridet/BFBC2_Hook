@@ -72,4 +72,8 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	hook->serverAddress = pt.get("proxy.serverAddress", "bfbc2.grzyb.dev");
 	hook->serverPort = pt.get("proxy.serverPort", 443);
 	hook->serverSecure = pt.get("proxy.serverSecure", true);
+
+	// Section - Overrides
+	hook->clientVersion = pt.get("overrides.clientVersion", "\"ROMEPC795745\"");
+	hook->serverVersion = pt.get("overrides.serverVersion", "\"ROMEPC851434\"");
 }
