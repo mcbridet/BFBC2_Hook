@@ -87,6 +87,8 @@ You can change the default behavior of the hook by creating JSON config named `g
 | proxy.serverAddress       | IP Address or Domain Name of custom server implementation                        | Any string                     | bfbc2.grzyb.dev                   |
 | proxy.serverPort          | Port of custom server implementation                                             | Unsigned short (Range 0-65535) | 443                               |
 | proxy.serverSecure        | Use secure connection (wss) or not encrypted connection (ws)                     | Boolean (true/false)           | true                              |
+| overrides.clientVersion   | Client version identifier                                                        | Any string                     | "ROMEPC795745"                    |
+| overrides.serverVersion   | Server version identifier                                                        | Any string                     | "ROMEPC851434"                    |
 
 ### Example configuration
 
