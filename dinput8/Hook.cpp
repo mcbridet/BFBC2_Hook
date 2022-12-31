@@ -137,25 +137,6 @@ void Hook::VerifyGameVersion()
 {
 	BOOST_LOG_NAMED_SCOPE("GameVersion")
 
-	// "ROMEPC795745" - Client R11
-	DWORD mClientVersionAddr = Utils::FindPattern(0x1400000, 0x600000,
-	                                              (BYTE*)"\x22\x52\x4F\x4D\x45\x50\x43\x37\x39\x35\x37\x34\x35\x22",
-	                                              "xxxxxxxxxxxxxx");
-
-	// "ROMEPC851434" - Server R34
-	DWORD mServerVersionAddr = Utils::FindPattern(0x1600000, 0x600000,
-	                                              (BYTE*)"\x22\x52\x4F\x4D\x45\x50\x43\x38\x35\x31\x34\x33\x34\x22",
-	                                              "xxxxxxxxxxxxxx");
-
-	if (config->hook->verifyGameVersion && (mClientVersionAddr == NULL && mServerVersionAddr == NULL))
-	{
-		MessageBoxA(
-			nullptr,
-			"Failed to initialize hook!\r\nUnknown client/server detected!\r\nPlease verify the integrity of your files and try again.",
-			"Initialization Failure", MB_OK | MB_ICONWARNING);
-		ExitProcess(INVALID_GAME_VERSION);
-	}
-
 	std::string exeType;
 
 	if (config->hook->forceClientType != "")
@@ -181,7 +162,24 @@ void Hook::VerifyGameVersion()
 	}
 	else
 	{
-		std::string exeType;
+		// "ROMEPC795745" - Client R11
+		DWORD mClientVersionAddr = Utils::FindPattern(0x1400000, 0x600000,
+			(BYTE*)config->hook->clientVersion.c_str(),
+			"xxxxxxxxxxxxxx");
+
+		// "ROMEPC851434" - Server R34
+		DWORD mServerVersionAddr = Utils::FindPattern(0x1600000, 0x600000,
+			(BYTE*)config->hook->serverVersion.c_str(),
+			"xxxxxxxxxxxxxx");
+
+		if (config->hook->verifyGameVersion && (mClientVersionAddr == NULL && mServerVersionAddr == NULL))
+		{
+			MessageBoxA(
+				nullptr,
+				"Failed to initialize hook!\r\nUnknown client/server detected!\r\nPlease verify the integrity of your files and try again.",
+				"Initialization Failure", MB_OK | MB_ICONWARNING);
+			ExitProcess(INVALID_GAME_VERSION);
+		}
 
 		if (mClientVersionAddr != NULL)
 		{
