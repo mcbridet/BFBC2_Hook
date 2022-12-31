@@ -33,6 +33,10 @@ ConnectionWebSocket::ConnectionWebSocket(ProxyType type, std::function<void(unsi
 	wsPath += L":";
 	wsPath += std::to_wstring(config->hook->serverPort);
 	wsPath += type == PLASMA ? L"/plasma" : L"/theater";
+
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+	wsPathStr = converter.to_bytes(wsPath);
 }
 
 ConnectionWebSocket::~ConnectionWebSocket()
@@ -88,7 +92,8 @@ void ConnectionWebSocket::send(unsigned char* data, unsigned int length)
 		msg.set_binary_message(is);
 
 		ws.send(msg).wait();
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.service % packet.kind % packet.length % packet.data;
+
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] -> [%s] %s 0x%08x (%i bytes) {%s}") % wsPathStr % packet.service % packet.kind % packet.length % packet.data;
 	}
 	catch (const websocket_exception& ex)
 	{
@@ -161,12 +166,12 @@ void ConnectionWebSocket::handle_binary_message(Concurrency::streams::istream bi
 			            boost::asio::placeholders::bytes_transferred)
 		);
 
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] [PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.service % packet.kind % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[UDP] [PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % wsPathStr % packet.service % packet.kind % packet.length % packet.data;
 	}
 	else
 	{
 		sendToGame(send_buffer, length);
-		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % std::string(wsPath.begin(), wsPath.end()) % packet.service % packet.kind % packet.length % packet.data;
+		BOOST_LOG_TRIVIAL(debug) << boost::format("[PROXY] <- [%s] %s 0x%08x (%i bytes) {%s}") % wsPathStr % packet.service % packet.kind % packet.length % packet.data;
 	}
 }
 

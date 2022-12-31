@@ -22,6 +22,7 @@ private:
 	std::function<void()> closeCallback;
 
 	std::wstring wsPath;
+	std::string wsPathStr;
 
 	void handle_receive(web::websockets::client::websocket_incoming_message msg);
 
