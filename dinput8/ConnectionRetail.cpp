@@ -134,6 +134,7 @@ void ConnectionRetail::handle_read(const boost::system::error_code& error, size_
 
 			while (true)
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(150));
 				unsigned int length = length = Utils::DecodeInt(receive_buffer + current_offset + LENGTH_OFFSET,
 				                                                HEADER_VALUE_LENGTH);
 
