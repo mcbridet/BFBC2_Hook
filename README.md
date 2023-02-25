@@ -65,7 +65,7 @@ Copy all `dll` files from either the latest build in [GitHub Releases](https://g
 Configuration
 -------------
 
-You can change the default behavior of the hook by creating JSON config named `grzybdev.conf` in the game root folder
+You can change the default behavior of the hook by creating JSON config named `config.json` in the game root folder
 
 | Key                       | Description                                                                      | Allowed Values                 | Default Value                     |
 |---------------------------|----------------------------------------------------------------------------------|--------------------------------|-----------------------------------|

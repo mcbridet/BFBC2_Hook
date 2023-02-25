@@ -12,7 +12,7 @@ void Config::readConfig() const
 	using boost::property_tree::ptree;
 	ptree pt;
 
-	std::string configPath = "grzybdev.conf";
+	std::string configPath = "config.json";
 
 	try
 	{
