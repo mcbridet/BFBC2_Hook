@@ -76,4 +76,5 @@ void Config::parseConfig(boost::property_tree::ptree pt) const
 	// Section - Overrides
 	hook->clientVersion = pt.get("overrides.clientVersion", "\"ROMEPC795745\"");
 	hook->serverVersion = pt.get("overrides.serverVersion", "\"ROMEPC851434\"");
+	hook->sslPatchRetryCount = pt.get("overrides.sslPatchRetryCount", 3);
 }

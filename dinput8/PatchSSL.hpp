@@ -23,6 +23,7 @@ public:
 
 private:
 	bool enablePatch;
+	USHORT retryCount;
 
 	DWORD dwCodeSize;
 	DWORD dwCodeOffset;

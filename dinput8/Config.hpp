@@ -51,6 +51,7 @@ public:
 		/* Overrides */
 		std::string clientVersion;
 		std::string serverVersion;
+		USHORT sslPatchRetryCount;
 	};
 
 	HookConfig* hook = new HookConfig();
